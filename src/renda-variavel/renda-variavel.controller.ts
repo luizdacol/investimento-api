@@ -1,19 +1,45 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { RendaVariavelService } from './renda-variavel.service';
-import { Ativo } from './models/ativo';
-import { CreateAtivoDto } from './models/create-ativo.dto';
+import { CreateAtivoDto } from './dto/create-ativo.dto';
+import { UpdateAtivoDto } from './dto/update-ativo.dto';
 
-@Controller('renda-variavel')
+@Controller('v1/renda-variavel')
 export class RendaVariavelController {
   constructor(private readonly rendaVariavelService: RendaVariavelService) {}
 
-  @Get('/ativos')
-  getAtivos(): Ativo[] {
-    return this.rendaVariavelService.getAtivos();
+  @Post('ativos')
+  create(@Body() createRendaVariavelDto: CreateAtivoDto) {
+    return this.rendaVariavelService.create(createRendaVariavelDto);
   }
 
-  @Post('/ativos')
-  postAtivo(@Body() createAtivoDto: CreateAtivoDto): Ativo {
-    return this.rendaVariavelService.saveAtivo(createAtivoDto);
+  @Get('ativos')
+  findAll() {
+    return this.rendaVariavelService.findAll();
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.rendaVariavelService.findOne(+id);
+  }
+
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Body() updateRendaVariavelDto: UpdateAtivoDto,
+  ) {
+    return this.rendaVariavelService.update(+id, updateRendaVariavelDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.rendaVariavelService.remove(+id);
   }
 }
