@@ -1,4 +1,5 @@
 export class Ativo {
+  id: number;
   data: Date;
   ticker: string;
   precoUnitario: number;
