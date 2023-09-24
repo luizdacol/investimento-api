@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Operacao } from './operacao.entity';
+import { TipoAtivo } from 'src/enums/tipo-ativo.enum';
 
 @Entity('ativos')
 export class Ativo {
@@ -10,7 +11,7 @@ export class Ativo {
   ticker: string;
 
   @Column()
-  tipo: string;
+  tipo: TipoAtivo;
 
   @Column()
   segmento?: string;

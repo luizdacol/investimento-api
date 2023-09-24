@@ -24,7 +24,7 @@ export class RendaVariavelService {
     if (!ativo) {
       ativo = await this.ativosRepository.save({
         ticker: createOperacaoDto.ticker,
-        tipo: createOperacaoDto.tipoAtivo.toString(),
+        tipo: createOperacaoDto.tipoAtivo,
         segmento: createOperacaoDto.segmento,
       });
     }
@@ -34,7 +34,7 @@ export class RendaVariavelService {
       precoTotal: createOperacaoDto.precoTotal,
       precoUnitario: createOperacaoDto.precoUnitario,
       quantidade: createOperacaoDto.quantidade,
-      tipo: createOperacaoDto.tipoOperacao.toString(),
+      tipo: createOperacaoDto.tipoOperacao,
       ativo,
     });
 

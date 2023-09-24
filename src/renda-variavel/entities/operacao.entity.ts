@@ -6,6 +6,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Ativo } from './ativo.entity';
+import { TipoOperacao } from 'src/enums/tipo-operacao.enum';
 
 @Entity('operacoes')
 export class Operacao {
@@ -29,5 +30,5 @@ export class Operacao {
   precoTotal: number;
 
   @Column()
-  tipo: string;
+  tipo: TipoOperacao;
 }
