@@ -13,7 +13,7 @@ export class Operacao {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column('timestamptz')
+  @Column('date')
   data: Date;
 
   @ManyToOne(() => Ativo, (ativo) => ativo.id)

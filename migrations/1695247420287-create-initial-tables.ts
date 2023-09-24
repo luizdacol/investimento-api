@@ -15,7 +15,7 @@ export class CreateInitialTables1695247420287 implements MigrationInterface {
       `CREATE TABLE operacoes (
               id serial PRIMARY KEY,
               ativo_id INT NOT NULL,
-              data timestamptz NOT NULL,
+              data DATE NOT NULL,
               preco_unitario NUMERIC(15,8)  NOT NULL,
               quantidade INT NOT NULL,
               preco_total NUMERIC(15,8) NOT NULL,
