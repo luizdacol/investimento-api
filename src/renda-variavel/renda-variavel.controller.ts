@@ -17,7 +17,7 @@ export class RendaVariavelController {
 
   @Post('operacoes')
   create(@Body() createRendaVariavelDto: CreateOperacaoDto) {
-    console.log('request', createRendaVariavelDto);
+    console.log('[POST][Operacoes] Incoming request: ', createRendaVariavelDto);
     return this.rendaVariavelService.create(createRendaVariavelDto);
   }
 

@@ -18,15 +18,23 @@ export class RendaVariavelService {
 
   async create(createOperacaoDto: CreateOperacaoDto) {
     let ativo = await this.ativosRepository.findOneBy({
-      ticker: createOperacaoDto.ativo.ticker,
+      ticker: createOperacaoDto.ticker,
     });
 
     if (!ativo) {
-      ativo = await this.ativosRepository.save(createOperacaoDto.ativo);
+      ativo = await this.ativosRepository.save({
+        ticker: createOperacaoDto.ticker,
+        tipo: createOperacaoDto.tipoAtivo.toString(),
+        segmento: createOperacaoDto.segmento,
+      });
     }
 
     const operacaoSaved = this.operacoesRepository.save({
-      ...createOperacaoDto,
+      data: createOperacaoDto.data,
+      precoTotal: createOperacaoDto.precoTotal,
+      precoUnitario: createOperacaoDto.precoUnitario,
+      quantidade: createOperacaoDto.quantidade,
+      tipo: createOperacaoDto.tipoOperacao.toString(),
       ativo,
     });
 
