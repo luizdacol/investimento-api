@@ -8,19 +8,20 @@ import {
   Delete,
 } from '@nestjs/common';
 import { RendaVariavelService } from './renda-variavel.service';
-import { CreateAtivoDto } from './dto/create-ativo.dto';
-import { UpdateAtivoDto } from './dto/update-ativo.dto';
+import { CreateOperacaoDto } from './dto/create-operacao.dto';
+import { UpdateOperacaoDto } from './dto/update-operacao.dto';
 
 @Controller('v1/renda-variavel')
 export class RendaVariavelController {
   constructor(private readonly rendaVariavelService: RendaVariavelService) {}
 
-  @Post('ativos')
-  create(@Body() createRendaVariavelDto: CreateAtivoDto) {
+  @Post('operacoes')
+  create(@Body() createRendaVariavelDto: CreateOperacaoDto) {
+    console.log('request', createRendaVariavelDto);
     return this.rendaVariavelService.create(createRendaVariavelDto);
   }
 
-  @Get('ativos')
+  @Get('operacoes')
   findAll() {
     return this.rendaVariavelService.findAll();
   }
@@ -33,7 +34,7 @@ export class RendaVariavelController {
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body() updateRendaVariavelDto: UpdateAtivoDto,
+    @Body() updateRendaVariavelDto: UpdateOperacaoDto,
   ) {
     return this.rendaVariavelService.update(+id, updateRendaVariavelDto);
   }

@@ -1,10 +1,20 @@
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Operacao } from './operacao.entity';
+
+@Entity('ativos')
 export class Ativo {
+  @PrimaryGeneratedColumn()
   id: number;
-  data: Date;
+
+  @Column()
   ticker: string;
-  precoUnitario: number;
-  quantidade: number;
-  precoTotal: number;
-  operacao: string;
+
+  @Column()
   tipo: string;
+
+  @Column()
+  segmento?: string;
+
+  @OneToMany(() => Operacao, (operacao) => operacao.ativo)
+  operacoes: Operacao[];
 }

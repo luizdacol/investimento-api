@@ -1,29 +1,50 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAtivoDto } from './dto/create-ativo.dto';
-import { UpdateAtivoDto } from './dto/update-ativo.dto';
+import { CreateOperacaoDto } from './dto/create-operacao.dto';
+import { UpdateOperacaoDto } from './dto/update-operacao.dto';
 import { Ativo } from './entities/ativo.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Operacao } from './entities/operacao.entity';
 
 @Injectable()
 export class RendaVariavelService {
-  private _ativos: Ativo[] = [];
+  constructor(
+    @InjectRepository(Operacao)
+    private operacoesRepository: Repository<Operacao>,
 
-  create(createAtivoDto: CreateAtivoDto) {
-    const id = this._ativos.length + 1;
-    const createdAtivo = { id, ...createAtivoDto };
+    @InjectRepository(Ativo)
+    private ativosRepository: Repository<Ativo>,
+  ) {}
 
-    this._ativos.push(createdAtivo);
-    return createdAtivo;
+  async create(createOperacaoDto: CreateOperacaoDto) {
+    let ativo = await this.ativosRepository.findOneBy({
+      ticker: createOperacaoDto.ativo.ticker,
+    });
+
+    if (!ativo) {
+      ativo = await this.ativosRepository.save(createOperacaoDto.ativo);
+    }
+
+    const operacaoSaved = this.operacoesRepository.save({
+      ...createOperacaoDto,
+      ativo,
+    });
+
+    return operacaoSaved;
   }
 
-  findAll() {
-    return this._ativos;
+  async findAll() {
+    const operacoes = await this.operacoesRepository.find({
+      relations: { ativo: true },
+    });
+    return operacoes;
   }
 
   findOne(id: number) {
     return `This action returns a #${id} rendaVariavel`;
   }
 
-  update(id: number, updateAtivoDto: UpdateAtivoDto) {
+  update(id: number, updateAtivoDto: UpdateOperacaoDto) {
     return `This action updates a #${id} rendaVariavel: ${updateAtivoDto}`;
   }
 
