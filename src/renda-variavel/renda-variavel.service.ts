@@ -56,7 +56,8 @@ export class RendaVariavelService {
     return `This action updates a #${id} rendaVariavel: ${updateAtivoDto}`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} rendaVariavel`;
+  async remove(id: number): Promise<boolean> {
+    const result = await this.operacoesRepository.delete({ id: id });
+    return result.affected > 0;
   }
 }

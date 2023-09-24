@@ -6,6 +6,8 @@ import {
   Patch,
   Param,
   Delete,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { RendaVariavelService } from './renda-variavel.service';
 import { CreateOperacaoDto } from './dto/create-operacao.dto';
@@ -39,8 +41,9 @@ export class RendaVariavelController {
     return this.rendaVariavelService.update(+id, updateRendaVariavelDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.rendaVariavelService.remove(+id);
+  @Delete('operacoes/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async remove(@Param('id') id: string): Promise<boolean> {
+    return await this.rendaVariavelService.remove(+id);
   }
 }
