@@ -48,8 +48,11 @@ export class RendaVariavelService {
     return operacoes;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} rendaVariavel`;
+  async findOne(id: number): Promise<Operacao> {
+    return await this.operacoesRepository.findOne({
+      where: { id: id },
+      relations: { ativo: true },
+    });
   }
 
   update(id: number, updateAtivoDto: UpdateOperacaoDto) {

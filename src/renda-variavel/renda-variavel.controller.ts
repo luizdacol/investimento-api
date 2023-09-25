@@ -12,6 +12,7 @@ import {
 import { RendaVariavelService } from './renda-variavel.service';
 import { CreateOperacaoDto } from './dto/create-operacao.dto';
 import { UpdateOperacaoDto } from './dto/update-operacao.dto';
+import { Operacao } from './entities/operacao.entity';
 
 @Controller('v1/renda-variavel')
 export class RendaVariavelController {
@@ -28,8 +29,8 @@ export class RendaVariavelController {
     return this.rendaVariavelService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
+  @Get('operacoes/:id')
+  async findOne(@Param('id') id: string): Promise<Operacao> {
     return this.rendaVariavelService.findOne(+id);
   }
 
