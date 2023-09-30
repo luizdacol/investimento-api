@@ -44,6 +44,7 @@ export class RendaVariavelService {
   async findAll() {
     const operacoes = await this.operacoesRepository.find({
       relations: { ativo: true },
+      order: { data: 'DESC' },
     });
     return operacoes;
   }
