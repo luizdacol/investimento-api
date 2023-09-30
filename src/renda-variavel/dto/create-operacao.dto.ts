@@ -29,9 +29,6 @@ export class CreateOperacaoDto {
   @IsInt()
   quantidade: number;
 
-  @IsNumber()
-  precoTotal: number;
-
   @IsEnum(TipoOperacao)
   tipoOperacao: TipoOperacao;
 }

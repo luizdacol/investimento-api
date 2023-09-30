@@ -31,7 +31,8 @@ export class RendaVariavelService {
 
     const operacaoSaved = this.operacoesRepository.save({
       data: createOperacaoDto.data,
-      precoTotal: createOperacaoDto.precoTotal,
+      precoTotal:
+        createOperacaoDto.precoUnitario * createOperacaoDto.quantidade,
       precoUnitario: createOperacaoDto.precoUnitario,
       quantidade: createOperacaoDto.quantidade,
       tipo: createOperacaoDto.tipoOperacao,
@@ -68,10 +69,11 @@ export class RendaVariavelService {
       operacao.quantidade = updateAtivoDto.quantidade;
     if (updateAtivoDto.precoUnitario)
       operacao.precoUnitario = updateAtivoDto.precoUnitario;
-    if (updateAtivoDto.precoTotal)
-      operacao.precoTotal = updateAtivoDto.precoTotal;
     if (updateAtivoDto.tipoOperacao)
       operacao.tipo = updateAtivoDto.tipoOperacao;
+
+    operacao.precoTotal =
+      updateAtivoDto.precoUnitario * updateAtivoDto.quantidade;
 
     const result = await this.operacoesRepository.update({ id: id }, operacao);
     return result.affected > 0;
