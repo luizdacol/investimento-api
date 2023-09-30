@@ -34,11 +34,11 @@ export class RendaVariavelController {
     return this.rendaVariavelService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(
+  @Patch('operacoes/:id')
+  async update(
     @Param('id') id: string,
     @Body() updateRendaVariavelDto: UpdateOperacaoDto,
-  ) {
+  ): Promise<boolean> {
     return this.rendaVariavelService.update(+id, updateRendaVariavelDto);
   }
 

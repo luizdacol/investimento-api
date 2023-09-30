@@ -55,8 +55,25 @@ export class RendaVariavelService {
     });
   }
 
-  update(id: number, updateAtivoDto: UpdateOperacaoDto) {
-    return `This action updates a #${id} rendaVariavel: ${updateAtivoDto}`;
+  async update(
+    id: number,
+    updateAtivoDto: UpdateOperacaoDto,
+  ): Promise<boolean> {
+    const operacao = await this.findOne(id);
+    if (!operacao) throw Error('Operação não encontrada');
+
+    if (updateAtivoDto.data) operacao.data = updateAtivoDto.data;
+    if (updateAtivoDto.quantidade)
+      operacao.quantidade = updateAtivoDto.quantidade;
+    if (updateAtivoDto.precoUnitario)
+      operacao.precoUnitario = updateAtivoDto.precoUnitario;
+    if (updateAtivoDto.precoTotal)
+      operacao.precoTotal = updateAtivoDto.precoTotal;
+    if (updateAtivoDto.tipoOperacao)
+      operacao.tipo = updateAtivoDto.tipoOperacao;
+
+    const result = await this.operacoesRepository.update({ id: id }, operacao);
+    return result.affected > 0;
   }
 
   async remove(id: number): Promise<boolean> {
