@@ -6,6 +6,8 @@ import {
   Patch,
   Param,
   Delete,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { ProventosService } from './proventos.service';
 import { CreateProventoDto } from './dto/create-provento.dto';
@@ -41,6 +43,7 @@ export class ProventosController {
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id') id: string): Promise<boolean> {
     return this.proventosService.remove(+id);
   }

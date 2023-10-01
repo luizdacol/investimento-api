@@ -89,8 +89,33 @@ export class ProventosService {
     });
   }
 
-  update(id: number, updateProventoDto: UpdateProventoDto) {
-    return `This action updates a #${id} provento`;
+  async update(id: number, updateProventoDto: UpdateProventoDto) {
+    const provento = await this.findOne(id);
+    if (!provento) throw Error('Provento não encontrada');
+
+    if (updateProventoDto.dataCom) provento.dataCom = updateProventoDto.dataCom;
+    if (updateProventoDto.dataPagamento)
+      provento.dataPagamento = updateProventoDto.dataPagamento;
+    if (updateProventoDto.valorBruto)
+      provento.valorBruto = updateProventoDto.valorBruto;
+    if (updateProventoDto.tipo) provento.tipo = updateProventoDto.tipo;
+
+    provento.valorLiquido = this.calcularValorLiquido(
+      provento.valorBruto,
+      provento.tipo,
+    );
+
+    const operacoes = await this.operacoesService.findAll();
+    provento.posicao = this.calcularPosicao(
+      operacoes,
+      provento.ativo.ticker,
+      provento.dataCom,
+    );
+
+    provento.valorTotal = provento.valorLiquido * provento.posicao;
+
+    const result = await this.proventosRepository.update({ id: id }, provento);
+    return result.affected > 0;
   }
 
   async remove(id: number): Promise<boolean> {
