@@ -9,32 +9,32 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { RendaVariavelService } from './renda-variavel.service';
+import { OperacoesService } from './operacoes.service';
 import { CreateOperacaoDto } from './dto/create-operacao.dto';
 import { UpdateOperacaoDto } from './dto/update-operacao.dto';
 import { Operacao } from './entities/operacao.entity';
 
-@Controller('v1/renda-variavel')
-export class RendaVariavelController {
-  constructor(private readonly rendaVariavelService: RendaVariavelService) {}
+@Controller('v1/renda-variavel/operacoes')
+export class OperacoesController {
+  constructor(private readonly rendaVariavelService: OperacoesService) {}
 
-  @Post('operacoes')
+  @Post()
   create(@Body() createRendaVariavelDto: CreateOperacaoDto) {
     console.log('[POST][Operacoes] Incoming request: ', createRendaVariavelDto);
     return this.rendaVariavelService.create(createRendaVariavelDto);
   }
 
-  @Get('operacoes')
+  @Get()
   findAll() {
     return this.rendaVariavelService.findAll();
   }
 
-  @Get('operacoes/:id')
+  @Get(':id')
   async findOne(@Param('id') id: string): Promise<Operacao> {
     return this.rendaVariavelService.findOne(+id);
   }
 
-  @Patch('operacoes/:id')
+  @Patch(':id')
   async update(
     @Param('id') id: string,
     @Body() updateRendaVariavelDto: UpdateOperacaoDto,
@@ -42,7 +42,7 @@ export class RendaVariavelController {
     return this.rendaVariavelService.update(+id, updateRendaVariavelDto);
   }
 
-  @Delete('operacoes/:id')
+  @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id') id: string): Promise<boolean> {
     return await this.rendaVariavelService.remove(+id);

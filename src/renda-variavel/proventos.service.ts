@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 import { Provento } from './entities/provento.entity';
 import { Ativo } from './entities/ativo.entity';
 import { TipoProvento } from 'src/enums/tipo-provento';
-import { RendaVariavelService } from './renda-variavel.service';
+import { OperacoesService } from './operacoes.service';
 import { Operacao } from './entities/operacao.entity';
 import { TipoOperacao } from 'src/enums/tipo-operacao.enum';
 
@@ -19,7 +19,7 @@ export class ProventosService {
     @InjectRepository(Ativo)
     private ativosRepository: Repository<Ativo>,
 
-    private operacoesService: RendaVariavelService,
+    private operacoesService: OperacoesService,
   ) {}
 
   private calcularValorLiquido(valorBruto: number, tipo: TipoProvento): number {

@@ -7,7 +7,7 @@ import { Repository } from 'typeorm';
 import { Operacao } from './entities/operacao.entity';
 
 @Injectable()
-export class RendaVariavelService {
+export class OperacoesService {
   constructor(
     @InjectRepository(Operacao)
     private operacoesRepository: Repository<Operacao>,
