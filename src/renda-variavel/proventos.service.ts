@@ -8,6 +8,7 @@ import { Ativo } from './entities/ativo.entity';
 import { TipoProvento } from 'src/enums/tipo-provento';
 import { RendaVariavelService } from './renda-variavel.service';
 import { Operacao } from './entities/operacao.entity';
+import { TipoOperacao } from 'src/enums/tipo-operacao.enum';
 
 @Injectable()
 export class ProventosService {
@@ -34,10 +35,12 @@ export class ProventosService {
   ): number {
     const posicao = operacoes
       .filter((o) => o.ativo.ticker === ticker && o.data <= dataBase)
-      .reduce(
-        (posicao, operacaoAtual) => posicao + operacaoAtual.quantidade,
-        0,
-      );
+      .reduce((posicao, operacaoAtual) => {
+        if (operacaoAtual.tipo === TipoOperacao.COMPRA)
+          return posicao + operacaoAtual.quantidade;
+        else if (operacaoAtual.tipo === TipoOperacao.VENDA)
+          return posicao - operacaoAtual.quantidade;
+      }, 0);
 
     return posicao;
   }
