@@ -32,7 +32,10 @@ export class CarteiraService {
         ativo.ticker,
       );
 
-      ativoNaCarteira.precoMedio = valorTotal / ativoNaCarteira.quantidade;
+      ativoNaCarteira.precoMedio =
+        ativoNaCarteira.quantidade > 0
+          ? valorTotal / ativoNaCarteira.quantidade
+          : 0;
       ativoNaCarteira.precoMedioTotal =
         ativoNaCarteira.precoMedio * ativoNaCarteira.quantidade;
 
