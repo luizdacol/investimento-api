@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { RendaVariavelModule } from './renda-variavel/renda-variavel.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CarteiraModule } from './carteira/carteira.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       migrationsRun: false,
       logging: ['query'],
     }),
+    CarteiraModule,
   ],
   controllers: [AppController],
   providers: [AppService],

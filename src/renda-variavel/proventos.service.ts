@@ -7,8 +7,7 @@ import { Provento } from './entities/provento.entity';
 import { Ativo } from './entities/ativo.entity';
 import { TipoProvento } from 'src/enums/tipo-provento';
 import { OperacoesService } from './operacoes.service';
-import { Operacao } from './entities/operacao.entity';
-import { TipoOperacao } from 'src/enums/tipo-operacao.enum';
+import { AtivosService } from './ativos.service';
 
 @Injectable()
 export class ProventosService {
@@ -20,6 +19,7 @@ export class ProventosService {
     private ativosRepository: Repository<Ativo>,
 
     private operacoesService: OperacoesService,
+    private _ativosService: AtivosService,
   ) {}
 
   private calcularValorLiquido(valorBruto: number, tipo: TipoProvento): number {
@@ -28,28 +28,10 @@ export class ProventosService {
     return valorBruto;
   }
 
-  private calcularPosicao(
-    operacoes: Operacao[],
-    ticker: string,
-    dataBase: Date,
-  ): number {
-    const posicao = operacoes
-      .filter((o) => o.ativo.ticker === ticker && o.data <= dataBase)
-      .reduce((posicao, operacaoAtual) => {
-        if (operacaoAtual.tipo === TipoOperacao.COMPRA)
-          return posicao + operacaoAtual.quantidade;
-        else if (operacaoAtual.tipo === TipoOperacao.VENDA)
-          return posicao - operacaoAtual.quantidade;
-      }, 0);
-
-    return posicao;
-  }
-
   async create(createProventoDto: CreateProventoDto) {
-    const ativo = await this.ativosRepository.findOneBy({
+    const ativo = await this._ativosService.getOrCreate({
       ticker: createProventoDto.ticker,
     });
-    if (!ativo) throw new Error('Ativo não encontrado');
 
     const valorLiquido = this.calcularValorLiquido(
       createProventoDto.valorBruto,
@@ -57,7 +39,7 @@ export class ProventosService {
     );
 
     const operacoes = await this.operacoesService.findAll();
-    const posicao = this.calcularPosicao(
+    const posicao = this.operacoesService.calcularPosicao(
       operacoes,
       createProventoDto.ticker,
       createProventoDto.dataCom,
@@ -109,7 +91,7 @@ export class ProventosService {
     );
 
     const operacoes = await this.operacoesService.findAll();
-    provento.posicao = this.calcularPosicao(
+    provento.posicao = this.operacoesService.calcularPosicao(
       operacoes,
       provento.ativo.ticker,
       provento.dataCom,
