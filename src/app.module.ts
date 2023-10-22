@@ -18,7 +18,7 @@ import { CarteiraModule } from './carteira/carteira.module';
       synchronize: false,
       autoLoadEntities: true,
       migrationsRun: false,
-      logging: ['query'],
+      //logging: ['query'],
     }),
     CarteiraModule,
   ],
