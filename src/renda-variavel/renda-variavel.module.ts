@@ -13,6 +13,6 @@ import { AtivosService } from './ativos.service';
   imports: [TypeOrmModule.forFeature([Ativo, Operacao, Provento])],
   controllers: [OperacoesController, ProventosController],
   providers: [OperacoesService, ProventosService, AtivosService],
-  exports: [OperacoesService, AtivosService],
+  exports: [OperacoesService, AtivosService, ProventosService],
 })
 export class RendaVariavelModule {}

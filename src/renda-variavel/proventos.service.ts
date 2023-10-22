@@ -107,4 +107,46 @@ export class ProventosService {
     const result = await this.proventosRepository.delete({ id: id });
     return result.affected > 0;
   }
+
+  calcularValorRecebido(
+    proventos: Provento[],
+    ticker: string,
+    dataBase: Date = new Date(),
+  ): number {
+    console.log(
+      'opa: ',
+      proventos.filter((o) => this.filtroPorTickerEData(o, ticker, dataBase)),
+    );
+
+    const posicao = proventos
+      .filter((o) => this.filtroPorTickerEData(o, ticker, dataBase))
+      .reduce((posicao, provento) => posicao + provento.valorTotal, 0);
+
+    return posicao;
+  }
+
+  calcularValorProvisionado(
+    proventos: Provento[],
+    ticker: string,
+    dataBase: Date = new Date(),
+  ): number {
+    const posicao = proventos
+      .filter((o) => this.filtroPorTickerEData(o, ticker, dataBase, true))
+      .reduce((posicao, provento) => posicao + provento.valorTotal, 0);
+
+    return posicao;
+  }
+
+  private filtroPorTickerEData(
+    o: Provento,
+    ticker: string,
+    dataBase: Date,
+    desdeDataBase: boolean = false,
+  ) {
+    return desdeDataBase
+      ? o.ativo.ticker === ticker &&
+          o.dataPagamento.toString() > dataBase.toISOString().substring(0, 10)
+      : o.ativo.ticker === ticker &&
+          o.dataPagamento.toString() <= dataBase.toISOString().substring(0, 10);
+  }
 }
