@@ -113,16 +113,9 @@ export class ProventosService {
     ticker: string,
     dataBase: Date = new Date(),
   ): number {
-    console.log(
-      'opa: ',
-      proventos.filter((o) => this.filtroPorTickerEData(o, ticker, dataBase)),
-    );
-
-    const posicao = proventos
-      .filter((o) => this.filtroPorTickerEData(o, ticker, dataBase))
-      .reduce((posicao, provento) => posicao + provento.valorTotal, 0);
-
-    return posicao;
+    return proventos
+      .filter((p) => this.filtroPorTickerAteData(p, ticker, dataBase))
+      .reduce((valor, provento) => valor + provento.valorTotal, 0);
   }
 
   calcularValorProvisionado(
@@ -130,23 +123,20 @@ export class ProventosService {
     ticker: string,
     dataBase: Date = new Date(),
   ): number {
-    const posicao = proventos
-      .filter((o) => this.filtroPorTickerEData(o, ticker, dataBase, true))
-      .reduce((posicao, provento) => posicao + provento.valorTotal, 0);
-
-    return posicao;
+    return proventos
+      .filter((p) => this.filtroPorTickerAPartirData(p, ticker, dataBase))
+      .reduce((valor, provento) => valor + provento.valorTotal, 0);
   }
 
-  private filtroPorTickerEData(
+  private filtroPorTickerAPartirData(
     o: Provento,
     ticker: string,
     dataBase: Date,
-    desdeDataBase: boolean = false,
   ) {
-    return desdeDataBase
-      ? o.ativo.ticker === ticker &&
-          o.dataPagamento.toString() > dataBase.toISOString().substring(0, 10)
-      : o.ativo.ticker === ticker &&
-          o.dataPagamento.toString() <= dataBase.toISOString().substring(0, 10);
+    return o.ativo.ticker === ticker && o.dataPagamento > dataBase;
+  }
+
+  private filtroPorTickerAteData(o: Provento, ticker: string, dataBase: Date) {
+    return o.ativo.ticker === ticker && o.dataPagamento <= dataBase;
   }
 }
