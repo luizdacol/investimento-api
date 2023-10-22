@@ -2,6 +2,7 @@ version: '3'
 
 services:
   db-investimento:
+    container_name: db-investimento
     image: postgres:15.4
     ports:
       - 5432:5432
