@@ -1,17 +1,20 @@
+import { Type } from 'class-transformer';
 import {
-  IsDateString,
   IsNotEmpty,
   IsString,
   IsEnum,
   IsNumber,
+  IsDate,
 } from 'class-validator';
 import { TipoProvento } from 'src/enums/tipo-provento';
 
 export class CreateProventoDto {
-  @IsDateString()
+  @IsDate()
+  @Type(() => Date)
   dataCom: Date;
 
-  @IsDateString()
+  @IsDate()
+  @Type(() => Date)
   dataPagamento: Date;
 
   @IsNotEmpty()
