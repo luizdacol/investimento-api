@@ -10,5 +10,6 @@ import { AtivosService } from 'src/renda-fixa/ativos.service';
   imports: [TypeOrmModule.forFeature([Ativo, Operacao])],
   controllers: [OperacoesController],
   providers: [OperacoesService, AtivosService],
+  exports: [OperacoesService, AtivosService],
 })
 export class RendaFixaModule {}
