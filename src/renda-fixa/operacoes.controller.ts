@@ -10,9 +10,9 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { OperacoesService } from './operacoes.service';
-import { Operacao } from './entities/operacao.entity';
 import { CreateOperacaoDto } from './dto/create-operacao.dto';
 import { UpdateOperacaoDto } from './dto/update-operacao.dto';
+import { ResponseOperacao } from './dto/response-operacao.dto';
 
 @Controller('v1/renda-fixa/operacoes')
 export class OperacoesController {
@@ -25,13 +25,15 @@ export class OperacoesController {
   }
 
   @Get()
-  findAll() {
-    return this.rendaFixaService.findAll();
+  async findAll(): Promise<ResponseOperacao[]> {
+    const operacoes = await this.rendaFixaService.findAll();
+    return operacoes.map((op) => ResponseOperacao.fromDomain(op));
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<Operacao> {
-    return this.rendaFixaService.findOne(+id);
+  async findOne(@Param('id') id: string): Promise<ResponseOperacao> {
+    const operacao = await this.rendaFixaService.findOne(+id);
+    return ResponseOperacao.fromDomain(operacao);
   }
 
   @Patch(':id')

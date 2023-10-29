@@ -5,6 +5,7 @@ import {
   IsEnum,
   IsNotEmpty,
   IsString,
+  IsOptional,
 } from 'class-validator';
 import { TipoAtivo } from 'src/enums/tipo-ativo.enum';
 import { TipoOperacao } from 'src/enums/tipo-operacao.enum';
@@ -30,6 +31,7 @@ export class CreateOperacaoDto {
   dataVencimento: Date;
 
   @IsString()
+  @IsOptional()
   codigo?: string;
 
   @IsEnum(TipoAtivo)
