@@ -1,7 +1,6 @@
 import {
   IsDateString,
   IsNumber,
-  IsInt,
   IsEnum,
   IsNotEmpty,
   IsString,
@@ -18,7 +17,7 @@ export class CreateOperacaoDto {
   @IsString()
   titulo: string;
 
-  @IsInt()
+  @IsNumber()
   quantidade: number;
 
   @IsNumber()

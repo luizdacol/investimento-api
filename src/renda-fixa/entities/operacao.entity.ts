@@ -21,7 +21,7 @@ export class Operacao {
   @JoinColumn({ name: 'ativo_id' })
   ativo: Ativo;
 
-  @Column({ transformer: new ColumnNumericTransformer() })
+  @Column('numeric', { transformer: new ColumnNumericTransformer() })
   quantidade: number;
 
   @Column('numeric', {
