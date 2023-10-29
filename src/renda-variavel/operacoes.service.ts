@@ -66,8 +66,7 @@ export class OperacoesService {
     if (updateAtivoDto.tipoOperacao)
       operacao.tipo = updateAtivoDto.tipoOperacao;
 
-    operacao.precoTotal =
-      updateAtivoDto.precoUnitario * updateAtivoDto.quantidade;
+    operacao.precoTotal = operacao.precoUnitario * operacao.quantidade;
 
     const result = await this.operacoesRepository.update({ id: id }, operacao);
     return result.affected > 0;
