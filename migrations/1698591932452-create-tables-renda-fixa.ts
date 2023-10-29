@@ -5,7 +5,7 @@ export class CreateTablesRendaFixa1698591932452 implements MigrationInterface {
     await queryRunner.query(
       `CREATE TABLE ativos_renda_fixa (
                   id serial PRIMARY KEY,
-                  titulo VARCHAR(6) UNIQUE NOT NULL,
+                  titulo VARCHAR(30) UNIQUE NOT NULL,
                   tipo VARCHAR(20) NOT NULL,
                   codigo VARCHAR(5) NULL
               );`,
