@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { RendaVariavelModule } from './renda-variavel/renda-variavel.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CarteiraModule } from './carteira/carteira.module';
+import { RendaFixaModule } from './renda-fixa/renda-fixa.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { CarteiraModule } from './carteira/carteira.module';
       //logging: ['query'],
     }),
     CarteiraModule,
+    RendaFixaModule,
   ],
   controllers: [AppController],
   providers: [AppService],
