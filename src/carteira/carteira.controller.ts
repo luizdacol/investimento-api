@@ -1,4 +1,10 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  Controller,
+  Get,
+  Query,
+  UseInterceptors,
+} from '@nestjs/common';
 import { CarteiraService } from './carteira.service';
 import { TipoAtivo } from 'src/enums/tipo-ativo.enum';
 import { CarteiraRendaVariavelDto } from './dto/carteira-renda-variavel.dto';
@@ -8,6 +14,7 @@ import { CarteiraRendaFixaDto } from './dto/carteira-renda-fixa.dto';
 export class CarteiraController {
   constructor(private readonly carteiraService: CarteiraService) {}
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get('renda-variavel')
   async getCarteiraRendaVariavel(
     @Query('tipo') tipo: TipoAtivo,
@@ -18,6 +25,7 @@ export class CarteiraController {
     return Array.from(carteira.values());
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get('renda-fixa')
   async getCarteiraRendaFixa(
     @Query('tipo') tipo: TipoAtivo,

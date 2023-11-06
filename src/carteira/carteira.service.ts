@@ -59,17 +59,13 @@ export class CarteiraService {
         ativoNaCarteira.quantidade > 0
           ? valorTotal / ativoNaCarteira.quantidade
           : 0;
-      ativoNaCarteira.precoMedioTotal =
-        ativoNaCarteira.precoMedio * ativoNaCarteira.quantidade;
 
       ativoNaCarteira.composicao = 0;
       ativoNaCarteira.composicaoTotal = 0;
-      ativoNaCarteira.precoMercado = 0;
-      ativoNaCarteira.precoMercadoTotal = 0;
+      ativoNaCarteira.precoMercado = ativo.cotacao || 0;
       ativoNaCarteira.dividendosProvisionados = proventosProvisionados;
       ativoNaCarteira.dividendosRecebidos = proventosRecebidos;
       ativoNaCarteira.yieldOnCost = 0;
-      ativoNaCarteira.variacao = 0;
 
       carteira.set(ativo.id, ativoNaCarteira);
     }
@@ -105,14 +101,10 @@ export class CarteiraService {
         ativoNaCarteira.quantidade > 0
           ? valorTotal / ativoNaCarteira.quantidade
           : 0;
-      ativoNaCarteira.precoMedioTotal =
-        ativoNaCarteira.precoMedio * ativoNaCarteira.quantidade;
 
+      ativoNaCarteira.precoMercado = ativo.cotacao || 0;
       ativoNaCarteira.composicao = 0;
       ativoNaCarteira.composicaoTotal = 0;
-      ativoNaCarteira.precoMercado = 0;
-      ativoNaCarteira.precoMercadoTotal = 0;
-      ativoNaCarteira.variacao = 0;
 
       carteira.set(ativo.id, ativoNaCarteira);
     }
