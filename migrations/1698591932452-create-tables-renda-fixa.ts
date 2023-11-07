@@ -17,7 +17,7 @@ export class CreateTablesRendaFixa1698591932452 implements MigrationInterface {
                     ativo_id INT NOT NULL,
                     data DATE NOT NULL,
                     preco_unitario NUMERIC(15,8)  NOT NULL,
-                    quantidade NUMERIC(5,2) NOT NULL,
+                    quantidade NUMERIC(7,2) NOT NULL,
                     preco_total NUMERIC(15,8) NOT NULL,
                     rentabilidade VARCHAR(50) NULL,
                     data_vencimento DATE NOT NULL,

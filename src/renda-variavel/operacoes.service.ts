@@ -89,6 +89,7 @@ export class OperacoesService {
           return posicao + operacaoAtual.quantidade;
         else if (operacaoAtual.tipo === TipoOperacao.VENDA)
           return posicao - operacaoAtual.quantidade;
+        else return 0;
       }, 0);
 
     return posicao;
@@ -106,6 +107,7 @@ export class OperacoesService {
           return valorTotal + operacaoAtual.precoTotal;
         else if (operacaoAtual.tipo === TipoOperacao.VENDA)
           return valorTotal - operacaoAtual.precoTotal;
+        else return 0;
       }, 0);
 
     return valorTotal;

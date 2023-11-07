@@ -23,6 +23,8 @@ export class CarteiraRendaVariavelDto {
 
   @Expose()
   get variacao(): number {
+    if (this.precoMedio === 0) return 0;
+
     return Math.round((this.precoMercado / this.precoMedio - 1) * 10000) / 100;
   }
 }
