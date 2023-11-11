@@ -113,7 +113,10 @@ export class OperacoesService {
     const posicao = operacoes
       .filter((o) => this.filtroPorTickerEData(o, ticker, dataBase))
       .reduce((posicao, operacaoAtual) => {
-        if (operacaoAtual.tipo === TipoOperacao.COMPRA)
+        if (
+          operacaoAtual.tipo === TipoOperacao.COMPRA ||
+          operacaoAtual.tipo === TipoOperacao.BONIFICACAO
+        )
           return (
             posicao +
             operacaoAtual.quantidade *
@@ -135,7 +138,10 @@ export class OperacoesService {
     const valorTotal = operacoes
       .filter((o) => this.filtroPorTickerEData(o, ticker, dataBase))
       .reduce((valorTotal, operacaoAtual) => {
-        if (operacaoAtual.tipo === TipoOperacao.COMPRA)
+        if (
+          operacaoAtual.tipo === TipoOperacao.COMPRA ||
+          operacaoAtual.tipo === TipoOperacao.BONIFICACAO
+        )
           return valorTotal + operacaoAtual.precoTotal;
         else if (
           operacaoAtual.tipo === TipoOperacao.VENDA ||
