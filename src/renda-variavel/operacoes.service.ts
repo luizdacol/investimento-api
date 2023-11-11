@@ -134,9 +134,12 @@ export class OperacoesService {
       .reduce((valorTotal, operacaoAtual) => {
         if (operacaoAtual.tipo === TipoOperacao.COMPRA)
           return valorTotal + operacaoAtual.precoTotal;
-        else if (operacaoAtual.tipo === TipoOperacao.VENDA)
+        else if (
+          operacaoAtual.tipo === TipoOperacao.VENDA ||
+          operacaoAtual.tipo === TipoOperacao.AMORTIZACAO
+        )
           return valorTotal - operacaoAtual.precoTotal;
-        else return 0;
+        else return valorTotal;
       }, 0);
 
     return valorTotal;
