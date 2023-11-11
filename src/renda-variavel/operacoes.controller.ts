@@ -26,7 +26,7 @@ export class OperacoesController {
 
   @Get()
   findAll() {
-    return this.rendaVariavelService.findAll();
+    return this.rendaVariavelService.findAll(undefined, { data: 'DESC' });
   }
 
   @Get(':id')
