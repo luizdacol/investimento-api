@@ -43,16 +43,11 @@ export class CarteiraService {
       );
 
       const proventos = await this._proventosRendaVariavelService.findAll();
-
-      const proventosRecebidos =
-        this._proventosRendaVariavelService.calcularValorRecebido(
+      const resumoProventos =
+        this._proventosRendaVariavelService.calcularResumoProventos(
           proventos,
           ativo.ticker,
-        );
-      const proventosProvisionados =
-        this._proventosRendaVariavelService.calcularValorProvisionado(
-          proventos,
-          ativo.ticker,
+          new Date(),
         );
 
       ativoNaCarteira.precoMedio =
@@ -63,9 +58,11 @@ export class CarteiraService {
       ativoNaCarteira.composicao = 0;
       ativoNaCarteira.composicaoTotal = 0;
       ativoNaCarteira.precoMercado = ativo.cotacao || 0;
-      ativoNaCarteira.dividendosProvisionados = proventosProvisionados;
-      ativoNaCarteira.dividendosRecebidos = proventosRecebidos;
-      ativoNaCarteira.yieldOnCost = 0;
+      ativoNaCarteira.dividendosProvisionados =
+        resumoProventos.proventosProvisionados;
+      ativoNaCarteira.dividendosRecebidos = resumoProventos.proventosRecebidos;
+      ativoNaCarteira.dividendosRecebidosPorUnidade =
+        resumoProventos.proventosPorAcao;
 
       carteira.set(ativo.id, ativoNaCarteira);
     }

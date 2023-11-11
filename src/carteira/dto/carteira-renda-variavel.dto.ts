@@ -1,4 +1,5 @@
 import { Expose } from 'class-transformer';
+import { toPercentRounded } from 'src/utils/helper';
 
 export class CarteiraRendaVariavelDto {
   ticker: string;
@@ -8,8 +9,8 @@ export class CarteiraRendaVariavelDto {
   composicao: number;
   composicaoTotal: number;
   dividendosRecebidos: number;
-  yieldOnCost: number;
   dividendosProvisionados: number;
+  dividendosRecebidosPorUnidade: number;
 
   @Expose()
   get precoMedioTotal(): number {
@@ -25,6 +26,15 @@ export class CarteiraRendaVariavelDto {
   get variacao(): number {
     if (this.precoMedio === 0) return 0;
 
-    return Math.round((this.precoMercado / this.precoMedio - 1) * 10000) / 100;
+    return toPercentRounded(this.precoMercado / this.precoMedio - 1);
+  }
+
+  @Expose()
+  get yieldOnCost(): number {
+    if (this.precoMedio === 0) return 0;
+
+    return toPercentRounded(
+      this.dividendosRecebidosPorUnidade / this.precoMedio,
+    );
   }
 }

@@ -108,35 +108,32 @@ export class ProventosService {
     return result.affected > 0;
   }
 
-  calcularValorRecebido(
+  calcularResumoProventos(
     proventos: Provento[],
     ticker: string,
     dataBase: Date = new Date(),
-  ): number {
-    return proventos
-      .filter((p) => this.filtroPorTickerAteData(p, ticker, dataBase))
-      .reduce((valor, provento) => valor + provento.valorTotal, 0);
-  }
+  ): {
+    proventosPorAcao: number;
+    proventosRecebidos: number;
+    proventosProvisionados: number;
+  } {
+    const proventosDoAtivo = proventos.filter((p) => p.ativo.ticker === ticker);
 
-  calcularValorProvisionado(
-    proventos: Provento[],
-    ticker: string,
-    dataBase: Date = new Date(),
-  ): number {
-    return proventos
-      .filter((p) => this.filtroPorTickerAPartirData(p, ticker, dataBase))
-      .reduce((valor, provento) => valor + provento.valorTotal, 0);
-  }
-
-  private filtroPorTickerAPartirData(
-    o: Provento,
-    ticker: string,
-    dataBase: Date,
-  ) {
-    return o.ativo.ticker === ticker && o.dataPagamento > dataBase;
-  }
-
-  private filtroPorTickerAteData(o: Provento, ticker: string, dataBase: Date) {
-    return o.ativo.ticker === ticker && o.dataPagamento <= dataBase;
+    return proventosDoAtivo.reduce(
+      (proventoResumido, proventoAtual) => {
+        if (proventoAtual.dataPagamento > dataBase) {
+          proventoResumido.proventosProvisionados += proventoAtual.valorTotal;
+        } else {
+          proventoResumido.proventosRecebidos += proventoAtual.valorTotal;
+          proventoResumido.proventosPorAcao += proventoAtual.valorLiquido;
+        }
+        return proventoResumido;
+      },
+      {
+        proventosPorAcao: 0,
+        proventosRecebidos: 0,
+        proventosProvisionados: 0,
+      },
+    );
   }
 }
