@@ -31,16 +31,15 @@ export class CarteiraService {
       const ativoNaCarteira = new CarteiraRendaVariavelDto();
 
       ativoNaCarteira.ticker = ativo.ticker;
-      ativoNaCarteira.quantidade =
-        this._operacoesRendaVariavelService.calcularPosicao(
+      const { precoMedio, posicao } =
+        this._operacoesRendaVariavelService.calcularResumoOperacoes(
           operacoes,
           ativo.ticker,
+          new Date(),
         );
 
-      const valorTotal = this._operacoesRendaVariavelService.calcularValorTotal(
-        operacoes,
-        ativo.ticker,
-      );
+      ativoNaCarteira.quantidade = posicao;
+      ativoNaCarteira.precoMedio = precoMedio;
 
       const proventos = await this._proventosRendaVariavelService.findAll();
       const resumoProventos =
@@ -49,11 +48,6 @@ export class CarteiraService {
           ativo.ticker,
           new Date(),
         );
-
-      ativoNaCarteira.precoMedio =
-        ativoNaCarteira.quantidade > 0
-          ? valorTotal / ativoNaCarteira.quantidade
-          : 0;
 
       ativoNaCarteira.composicao = 0;
       ativoNaCarteira.composicaoTotal = 0;

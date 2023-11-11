@@ -100,58 +100,53 @@ export class OperacoesService {
     );
   }
 
-  public calcularPosicao(
+  public calcularResumoOperacoes(
     operacoes: Operacao[],
     ticker: string,
     dataBase: Date = new Date(),
-  ): number {
+  ): {
+    precoMedio: number;
+    precoTotal: number;
+    posicao: number;
+  } {
     const fatorDesdobramentoPorData = this.calcularFatorDesdobramento(
       operacoes,
       ticker,
     );
 
-    const posicao = operacoes
-      .filter((o) => this.filtroPorTickerEData(o, ticker, dataBase))
-      .reduce((posicao, operacaoAtual) => {
+    const operacoesDoAtivo = operacoes.filter((o) =>
+      this.filtroPorTickerEData(o, ticker, dataBase),
+    );
+
+    return operacoesDoAtivo.reduce(
+      (operacaoResumida, operacaoAtual) => {
         if (
           operacaoAtual.tipo === TipoOperacao.COMPRA ||
           operacaoAtual.tipo === TipoOperacao.BONIFICACAO
-        )
-          return (
-            posicao +
+        ) {
+          operacaoResumida.posicao +=
             operacaoAtual.quantidade *
-              fatorDesdobramentoPorData.get(operacaoAtual.data.toISOString())
-          );
-        else if (operacaoAtual.tipo === TipoOperacao.VENDA)
-          return posicao - operacaoAtual.quantidade;
-        else return posicao;
-      }, 0);
+            fatorDesdobramentoPorData.get(operacaoAtual.data.toISOString());
 
-    return posicao;
-  }
+          operacaoResumida.precoTotal += operacaoAtual.precoTotal;
+          operacaoResumida.precoMedio =
+            operacaoResumida.precoTotal / operacaoResumida.posicao;
+        } else if (operacaoAtual.tipo === TipoOperacao.AMORTIZACAO) {
+          operacaoResumida.precoTotal -= operacaoAtual.precoTotal;
+          operacaoResumida.precoMedio =
+            operacaoResumida.precoTotal / operacaoResumida.posicao;
+        } else if (operacaoAtual.tipo === TipoOperacao.VENDA) {
+          operacaoResumida.posicao -= operacaoAtual.quantidade;
+        }
 
-  public calcularValorTotal(
-    operacoes: Operacao[],
-    ticker: string,
-    dataBase: Date = new Date(),
-  ): number {
-    const valorTotal = operacoes
-      .filter((o) => this.filtroPorTickerEData(o, ticker, dataBase))
-      .reduce((valorTotal, operacaoAtual) => {
-        if (
-          operacaoAtual.tipo === TipoOperacao.COMPRA ||
-          operacaoAtual.tipo === TipoOperacao.BONIFICACAO
-        )
-          return valorTotal + operacaoAtual.precoTotal;
-        else if (
-          operacaoAtual.tipo === TipoOperacao.VENDA ||
-          operacaoAtual.tipo === TipoOperacao.AMORTIZACAO
-        )
-          return valorTotal - operacaoAtual.precoTotal;
-        else return valorTotal;
-      }, 0);
-
-    return valorTotal;
+        return operacaoResumida;
+      },
+      {
+        precoTotal: 0,
+        precoMedio: 0,
+        posicao: 0,
+      },
+    );
   }
 
   private filtroPorTickerEData(o: Operacao, ticker: string, dataBase: Date) {

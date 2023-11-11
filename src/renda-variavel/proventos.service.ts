@@ -39,7 +39,7 @@ export class ProventosService {
     );
 
     const operacoes = await this.operacoesService.findAll();
-    const posicao = this.operacoesService.calcularPosicao(
+    const { posicao } = this.operacoesService.calcularResumoOperacoes(
       operacoes,
       createProventoDto.ticker,
       createProventoDto.dataCom,
@@ -91,12 +91,13 @@ export class ProventosService {
     );
 
     const operacoes = await this.operacoesService.findAll();
-    provento.posicao = this.operacoesService.calcularPosicao(
+    const { posicao } = this.operacoesService.calcularResumoOperacoes(
       operacoes,
       provento.ativo.ticker,
       provento.dataCom,
     );
 
+    provento.posicao = posicao;
     provento.valorTotal = provento.valorLiquido * provento.posicao;
 
     const result = await this.proventosRepository.update({ id: id }, provento);
