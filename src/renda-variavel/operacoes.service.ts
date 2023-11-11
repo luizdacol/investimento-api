@@ -77,19 +77,48 @@ export class OperacoesService {
     return result.affected > 0;
   }
 
+  private calcularFatorDesdobramento(
+    operacoes: Operacao[],
+    ticker: string,
+  ): Map<string, number> {
+    const operacoesDoAtivo = operacoes.filter((o) => o.ativo.ticker === ticker);
+    const desdobramentosDoAtivo = operacoesDoAtivo.filter(
+      (a) => a.tipo === TipoOperacao.DESDOBRAMENTO,
+    );
+
+    return new Map(
+      operacoesDoAtivo.map((operacao) => {
+        const fatorDesdobramento = desdobramentosDoAtivo
+          .filter((d) => d.data >= operacao.data)
+          .reduce<number>((fator, op) => fator * op.quantidade, 1);
+
+        return [operacao.data.toISOString(), fatorDesdobramento];
+      }),
+    );
+  }
+
   public calcularPosicao(
     operacoes: Operacao[],
     ticker: string,
     dataBase: Date = new Date(),
   ): number {
+    const fatorDesdobramentoPorData = this.calcularFatorDesdobramento(
+      operacoes,
+      ticker,
+    );
+
     const posicao = operacoes
       .filter((o) => this.filtroPorTickerEData(o, ticker, dataBase))
       .reduce((posicao, operacaoAtual) => {
         if (operacaoAtual.tipo === TipoOperacao.COMPRA)
-          return posicao + operacaoAtual.quantidade;
+          return (
+            posicao +
+            operacaoAtual.quantidade *
+              fatorDesdobramentoPorData.get(operacaoAtual.data.toISOString())
+          );
         else if (operacaoAtual.tipo === TipoOperacao.VENDA)
           return posicao - operacaoAtual.quantidade;
-        else return 0;
+        else return posicao;
       }, 0);
 
     return posicao;
@@ -114,9 +143,6 @@ export class OperacoesService {
   }
 
   private filtroPorTickerEData(o: Operacao, ticker: string, dataBase: Date) {
-    return (
-      o.ativo.ticker === ticker &&
-      o.data.toString() <= dataBase.toISOString().substring(0, 10)
-    );
+    return o.ativo.ticker === ticker && o.data <= dataBase;
   }
 }
