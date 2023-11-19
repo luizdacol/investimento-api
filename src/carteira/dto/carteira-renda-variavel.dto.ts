@@ -3,6 +3,7 @@ import { toPercentRounded } from 'src/utils/helper';
 
 export class CarteiraRendaVariavelDto {
   ticker: string;
+  tipoAtivo: string;
   quantidade: number;
   precoMedio: number;
   precoMercado: number;

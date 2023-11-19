@@ -2,6 +2,7 @@ import { Expose } from 'class-transformer';
 
 export class CarteiraRendaFixaDto {
   titulo: string;
+  tipoAtivo: string;
   quantidade: number;
   precoMedio: number;
   precoMercado: number;

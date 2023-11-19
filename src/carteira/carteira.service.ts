@@ -2,11 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { OperacoesService as OperacoesRendaVariavelService } from 'src/renda-variavel/operacoes.service';
 import { CarteiraRendaVariavelDto } from './dto/carteira-renda-variavel.dto';
 import { AtivosService as AtivosRendaVariavelService } from 'src/renda-variavel/ativos.service';
-import { TipoAtivo } from 'src/enums/tipo-ativo.enum';
 import { ProventosService as ProventosRendaVariavelService } from 'src/renda-variavel/proventos.service';
 import { OperacoesService as OperacoesRendaFixaService } from 'src/renda-fixa/operacoes.service';
 import { AtivosService as AtivosRendaFixaService } from 'src/renda-fixa/ativos.service';
 import { CarteiraRendaFixaDto } from './dto/carteira-renda-fixa.dto';
+import { Ativo as AtivoRendaVariavel } from 'src/renda-variavel/entities/ativo.entity';
+import { Ativo as AtivoRendaFixa } from 'src/renda-fixa/entities/ativo.entity';
+import { Provento } from 'src/renda-variavel/entities/provento.entity';
+import { Operacao as OperacaoRendaVariavel } from 'src/renda-variavel/entities/operacao.entity';
+import { Operacao as OperacaoRendaFixa } from 'src/renda-fixa/entities/operacao.entity';
+import { toPercentRounded } from 'src/utils/helper';
 
 @Injectable()
 export class CarteiraService {
@@ -18,88 +23,123 @@ export class CarteiraService {
     private readonly _ativosRendaFixaService: AtivosRendaFixaService,
   ) {}
 
-  async calculateCarteiraRendaVariavel(
-    tipo: TipoAtivo,
-  ): Promise<Map<number, CarteiraRendaVariavelDto>> {
-    const operacoes = await this._operacoesRendaVariavelService.findAll();
-    const ativos = await this._ativosRendaVariavelService.findAll({
-      tipo: tipo,
-    });
-    const carteira = new Map<number, CarteiraRendaVariavelDto>();
+  async calculateCarteira() {
+    const operacoesRV = await this._operacoesRendaVariavelService.findAll();
+    const ativosRV = await this._ativosRendaVariavelService.findAll({});
+    const proventosRV = await this._proventosRendaVariavelService.findAll();
 
-    for (const ativo of ativos) {
-      const ativoNaCarteira = new CarteiraRendaVariavelDto();
+    const operacoesRF = await this._operacoesRendaFixaService.findAll();
+    const ativosRF = await this._ativosRendaFixaService.findAll({});
 
-      ativoNaCarteira.ticker = ativo.ticker;
-      const { precoMedio, posicao } =
-        this._operacoesRendaVariavelService.calcularResumoOperacoes(
-          operacoes,
-          ativo.ticker,
-          new Date(),
+    const arrayAtivos = new Array<AtivoRendaVariavel | AtivoRendaFixa>(
+      ...ativosRF,
+      ...ativosRV,
+    );
+
+    const carteira: (CarteiraRendaVariavelDto | CarteiraRendaFixaDto)[] = [];
+    const total = new Map<string, number>();
+
+    for (const ativo of arrayAtivos) {
+      let ativoNaCarteira: CarteiraRendaVariavelDto | CarteiraRendaFixaDto;
+      if (ativo instanceof AtivoRendaVariavel) {
+        ativoNaCarteira = this.calculateAtivoRV(
+          ativo,
+          operacoesRV,
+          proventosRV,
         );
+      } else {
+        ativoNaCarteira = this.calculateAtivoRF(ativo, operacoesRF);
+      }
 
-      ativoNaCarteira.quantidade = posicao;
-      ativoNaCarteira.precoMedio = precoMedio;
+      const totalTipo = total.get(ativo.tipo) ?? 0;
+      total.set(ativo.tipo, totalTipo + ativoNaCarteira.precoMercadoTotal);
 
-      const proventos = await this._proventosRendaVariavelService.findAll();
-      const resumoProventos =
-        this._proventosRendaVariavelService.calcularResumoProventos(
-          proventos,
-          ativo.ticker,
-          new Date(),
-        );
-
-      ativoNaCarteira.composicao = 0;
-      ativoNaCarteira.composicaoTotal = 0;
-      ativoNaCarteira.precoMercado = ativo.cotacao || 0;
-      ativoNaCarteira.dividendosProvisionados =
-        resumoProventos.proventosProvisionados;
-      ativoNaCarteira.dividendosRecebidos = resumoProventos.proventosRecebidos;
-      ativoNaCarteira.dividendosRecebidosPorUnidade =
-        resumoProventos.proventosPorAcao;
-
-      carteira.set(ativo.id, ativoNaCarteira);
+      carteira.push(ativoNaCarteira);
     }
+
+    this.calculateComposicao(carteira, total);
 
     return carteira;
   }
 
-  async calculateCarteiraRendaFixa(
-    tipo: TipoAtivo,
-  ): Promise<Map<number, CarteiraRendaFixaDto>> {
-    const operacoes = await this._operacoesRendaFixaService.findAll();
-    const ativos = await this._ativosRendaFixaService.findAll({
-      tipo: tipo,
-    });
-    const carteira = new Map<number, CarteiraRendaFixaDto>();
+  calculateComposicao(
+    carteira: (CarteiraRendaVariavelDto | CarteiraRendaFixaDto)[],
+    total: Map<string, number>,
+  ) {
+    const totalCarteira = Array.from(total.values()).reduce(
+      (pv, cv) => pv + cv,
+      0,
+    );
 
-    for (const ativo of ativos) {
-      const ativoNaCarteira = new CarteiraRendaFixaDto();
+    for (const ativo of carteira) {
+      ativo.composicao = toPercentRounded(
+        ativo.precoMercadoTotal / total.get(ativo.tipoAtivo),
+      );
+      ativo.composicaoTotal = toPercentRounded(
+        ativo.precoMercadoTotal / totalCarteira,
+      );
+    }
+  }
 
-      ativoNaCarteira.titulo = ativo.titulo;
-      ativoNaCarteira.quantidade =
-        this._operacoesRendaFixaService.calcularPosicao(
-          operacoes,
-          ativo.titulo,
-        );
+  calculateAtivoRV(
+    ativo: AtivoRendaVariavel,
+    operacoes: OperacaoRendaVariavel[],
+    proventos: Provento[],
+  ): CarteiraRendaVariavelDto {
+    const ativoNaCarteira = new CarteiraRendaVariavelDto();
 
-      const valorTotal = this._operacoesRendaFixaService.calcularValorTotal(
+    const { precoMedio, posicao } =
+      this._operacoesRendaVariavelService.calcularResumoOperacoes(
         operacoes,
-        ativo.titulo,
+        ativo.ticker,
+        new Date(),
       );
 
-      ativoNaCarteira.precoMedio =
-        ativoNaCarteira.quantidade > 0
-          ? valorTotal / ativoNaCarteira.quantidade
-          : 0;
+    ativoNaCarteira.ticker = ativo.ticker;
+    ativoNaCarteira.tipoAtivo = ativo.tipo;
+    ativoNaCarteira.quantidade = posicao;
+    ativoNaCarteira.precoMedio = precoMedio;
 
-      ativoNaCarteira.precoMercado = ativo.cotacao || 0;
-      ativoNaCarteira.composicao = 0;
-      ativoNaCarteira.composicaoTotal = 0;
+    const resumoProventos =
+      this._proventosRendaVariavelService.calcularResumoProventos(
+        proventos,
+        ativo.ticker,
+        new Date(),
+      );
 
-      carteira.set(ativo.id, ativoNaCarteira);
-    }
+    ativoNaCarteira.precoMercado = ativo.cotacao || 0;
+    ativoNaCarteira.dividendosProvisionados =
+      resumoProventos.proventosProvisionados;
+    ativoNaCarteira.dividendosRecebidos = resumoProventos.proventosRecebidos;
+    ativoNaCarteira.dividendosRecebidosPorUnidade =
+      resumoProventos.proventosPorAcao;
 
-    return carteira;
+    return ativoNaCarteira;
+  }
+
+  calculateAtivoRF(
+    ativo: AtivoRendaFixa,
+    operacoes: OperacaoRendaFixa[],
+  ): CarteiraRendaFixaDto {
+    const ativoNaCarteira = new CarteiraRendaFixaDto();
+
+    ativoNaCarteira.titulo = ativo.titulo;
+    ativoNaCarteira.tipoAtivo = ativo.tipo;
+    ativoNaCarteira.quantidade =
+      this._operacoesRendaFixaService.calcularPosicao(operacoes, ativo.titulo);
+
+    const valorTotal = this._operacoesRendaFixaService.calcularValorTotal(
+      operacoes,
+      ativo.titulo,
+    );
+
+    ativoNaCarteira.precoMedio =
+      ativoNaCarteira.quantidade > 0
+        ? valorTotal / ativoNaCarteira.quantidade
+        : 0;
+
+    ativoNaCarteira.precoMercado = ativo.cotacao || 0;
+
+    return ativoNaCarteira;
   }
 }
