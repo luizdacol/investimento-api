@@ -37,7 +37,6 @@ export class CarteiraService {
     );
 
     const carteira: (CarteiraRendaVariavelDto | CarteiraRendaFixaDto)[] = [];
-    const total = new Map<string, number>();
 
     for (const ativo of arrayAtivos) {
       let ativoNaCarteira: CarteiraRendaVariavelDto | CarteiraRendaFixaDto;
@@ -51,25 +50,26 @@ export class CarteiraService {
         ativoNaCarteira = this.calculateAtivoRF(ativo, operacoesRF);
       }
 
-      const totalTipo = total.get(ativo.tipo) ?? 0;
-      total.set(ativo.tipo, totalTipo + ativoNaCarteira.precoMercadoTotal);
-
       carteira.push(ativoNaCarteira);
     }
 
-    this.calculateComposicao(carteira, total);
+    this.calculateComposicao(carteira);
 
     return carteira;
   }
 
   calculateComposicao(
     carteira: (CarteiraRendaVariavelDto | CarteiraRendaFixaDto)[],
-    total: Map<string, number>,
   ) {
-    const totalCarteira = Array.from(total.values()).reduce(
-      (pv, cv) => pv + cv,
-      0,
-    );
+    let totalCarteira = 0;
+    const total = carteira.reduce((kvPair, ativo) => {
+      const totalTipo = kvPair.get(ativo.tipoAtivo) ?? 0;
+
+      kvPair.set(ativo.tipoAtivo, totalTipo + ativo.precoMercadoTotal);
+      totalCarteira += ativo.precoMercadoTotal;
+
+      return kvPair;
+    }, new Map<string, number>());
 
     for (const ativo of carteira) {
       ativo.composicao = toPercentRounded(
