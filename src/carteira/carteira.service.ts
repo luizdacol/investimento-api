@@ -12,6 +12,7 @@ import { Provento } from 'src/renda-variavel/entities/provento.entity';
 import { Operacao as OperacaoRendaVariavel } from 'src/renda-variavel/entities/operacao.entity';
 import { Operacao as OperacaoRendaFixa } from 'src/renda-fixa/entities/operacao.entity';
 import { toPercentRounded } from 'src/utils/helper';
+import { TipoAtivo } from 'src/enums/tipo-ativo.enum';
 
 @Injectable()
 export class CarteiraService {
@@ -54,13 +55,53 @@ export class CarteiraService {
     }
 
     this.calculateComposicao(carteira);
+    this.calculateTotal(carteira);
 
     return carteira;
   }
 
-  calculateComposicao(
+  calculateTotal(
     carteira: (CarteiraRendaVariavelDto | CarteiraRendaFixaDto)[],
   ) {
+    const initialKvPair = new Map<
+      string,
+      CarteiraRendaVariavelDto | CarteiraRendaFixaDto
+    >([
+      [TipoAtivo.FII, new CarteiraRendaVariavelDto('Total')],
+      [TipoAtivo.ACAO, new CarteiraRendaVariavelDto('Total')],
+      [TipoAtivo.BDR, new CarteiraRendaVariavelDto('Total')],
+      [TipoAtivo.CDB, new CarteiraRendaFixaDto('Total')],
+      [TipoAtivo.TESOURO_DIRETO, new CarteiraRendaFixaDto('Total')],
+    ]);
+
+    const totais = carteira.reduce((kvPair, ativo) => {
+      const totalDoTipo = kvPair.get(ativo.tipoAtivo);
+
+      totalDoTipo.tipoAtivo = ativo.tipoAtivo;
+      totalDoTipo.quantidade = 1;
+      totalDoTipo.precoMedio += ativo.precoMedioTotal;
+      totalDoTipo.precoMercado += ativo.precoMercadoTotal;
+      totalDoTipo.composicao += ativo.composicao;
+      totalDoTipo.composicaoTotal += ativo.composicaoTotal;
+
+      if (
+        totalDoTipo instanceof CarteiraRendaVariavelDto &&
+        ativo instanceof CarteiraRendaVariavelDto
+      ) {
+        totalDoTipo.dividendosRecebidos += ativo.dividendosRecebidos;
+      }
+
+      kvPair.set(ativo.tipoAtivo, totalDoTipo);
+
+      return kvPair;
+    }, initialKvPair);
+
+    carteira.push(...Array.from(totais.values()));
+  }
+
+  calculateComposicao(
+    carteira: (CarteiraRendaVariavelDto | CarteiraRendaFixaDto)[],
+  ): void {
     let totalCarteira = 0;
     const total = carteira.reduce((kvPair, ativo) => {
       const totalTipo = kvPair.get(ativo.tipoAtivo) ?? 0;
@@ -86,7 +127,7 @@ export class CarteiraService {
     operacoes: OperacaoRendaVariavel[],
     proventos: Provento[],
   ): CarteiraRendaVariavelDto {
-    const ativoNaCarteira = new CarteiraRendaVariavelDto();
+    const ativoNaCarteira = new CarteiraRendaVariavelDto(ativo.ticker);
 
     const { precoMedio, posicao } =
       this._operacoesRendaVariavelService.calcularResumoOperacoes(
@@ -95,7 +136,6 @@ export class CarteiraService {
         new Date(),
       );
 
-    ativoNaCarteira.ticker = ativo.ticker;
     ativoNaCarteira.tipoAtivo = ativo.tipo;
     ativoNaCarteira.quantidade = posicao;
     ativoNaCarteira.precoMedio = precoMedio;
@@ -121,9 +161,8 @@ export class CarteiraService {
     ativo: AtivoRendaFixa,
     operacoes: OperacaoRendaFixa[],
   ): CarteiraRendaFixaDto {
-    const ativoNaCarteira = new CarteiraRendaFixaDto();
+    const ativoNaCarteira = new CarteiraRendaFixaDto(ativo.titulo);
 
-    ativoNaCarteira.titulo = ativo.titulo;
     ativoNaCarteira.tipoAtivo = ativo.tipo;
     ativoNaCarteira.quantidade =
       this._operacoesRendaFixaService.calcularPosicao(operacoes, ativo.titulo);

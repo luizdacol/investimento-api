@@ -2,16 +2,20 @@ import { Expose } from 'class-transformer';
 import { toPercentRounded } from 'src/utils/helper';
 
 export class CarteiraRendaVariavelDto {
+  constructor(ticker: string) {
+    this.ticker = ticker;
+  }
+
   ticker: string;
   tipoAtivo: string;
-  quantidade: number;
-  precoMedio: number;
-  precoMercado: number;
-  composicao: number;
-  composicaoTotal: number;
-  dividendosRecebidos: number;
-  dividendosProvisionados: number;
-  dividendosRecebidosPorUnidade: number;
+  quantidade: number = 0;
+  precoMedio: number = 0;
+  precoMercado: number = 0;
+  composicao: number = 0;
+  composicaoTotal: number = 0;
+  dividendosRecebidos: number = 0;
+  dividendosProvisionados: number = 0;
+  dividendosRecebidosPorUnidade: number = 0;
 
   @Expose()
   get precoMedioTotal(): number {

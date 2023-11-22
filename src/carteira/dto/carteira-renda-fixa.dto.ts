@@ -1,13 +1,17 @@
 import { Expose } from 'class-transformer';
 
 export class CarteiraRendaFixaDto {
+  constructor(titulo: string) {
+    this.titulo = titulo;
+  }
+
   titulo: string;
   tipoAtivo: string;
-  quantidade: number;
-  precoMedio: number;
-  precoMercado: number;
-  composicao: number;
-  composicaoTotal: number;
+  quantidade: number = 0;
+  precoMedio: number = 0;
+  precoMercado: number = 0;
+  composicao: number = 0;
+  composicaoTotal: number = 0;
 
   @Expose()
   get precoMedioTotal(): number {
