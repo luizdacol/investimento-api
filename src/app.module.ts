@@ -5,10 +5,12 @@ import { RendaVariavelModule } from './renda-variavel/renda-variavel.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CarteiraModule } from './carteira/carteira.module';
 import { RendaFixaModule } from './renda-fixa/renda-fixa.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
     RendaVariavelModule,
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',

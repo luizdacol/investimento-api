@@ -14,7 +14,7 @@ export class CreateAtivoDto {
   ticker: string;
 
   @IsEnum(TipoAtivo)
-  tipo: TipoAtivo;
+  tipo?: TipoAtivo;
 
   @IsString()
   segmento?: string;

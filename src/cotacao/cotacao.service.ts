@@ -4,18 +4,23 @@ import { RootResult } from './dto/root-result.dto';
 import { QuoteInfoResponse } from './dto/quote-info-response.dto';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class CotacaoService {
-  constructor(private readonly httpService: HttpService) {}
+  private readonly _token: string;
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
+  ) {
+    this._token = this.configService.get<string>('BRAPI_TOKEN');
+  }
 
   async getQuoteInformation(quote: string): Promise<QuoteInfoResponse> {
-    const token = '1c2koveY28Arb28baoyrpJ';
-
     const { data: rootResult } = await firstValueFrom(
       this.httpService
         .get<RootResult<QuoteInfoResponse>>(
-          `https://brapi.dev/api/quote/${quote}?token=${token}`,
+          `https://brapi.dev/api/quote/${quote}?token=${this._token}`,
         )
         .pipe(
           catchError((error: AxiosError) => {
