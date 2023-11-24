@@ -8,10 +8,15 @@ import { ProventosController } from './proventos.controller';
 import { ProventosService } from './proventos.service';
 import { Provento } from './entities/provento.entity';
 import { AtivosService } from './ativos.service';
+import { CotacaoModule } from 'src/cotacao/cotacao.module';
+import { AtivosController } from './ativos.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Ativo, Operacao, Provento])],
-  controllers: [OperacoesController, ProventosController],
+  imports: [
+    TypeOrmModule.forFeature([Ativo, Operacao, Provento]),
+    CotacaoModule,
+  ],
+  controllers: [OperacoesController, ProventosController, AtivosController],
   providers: [OperacoesService, ProventosService, AtivosService],
   exports: [OperacoesService, AtivosService, ProventosService],
 })
