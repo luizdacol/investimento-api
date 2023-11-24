@@ -1,4 +1,4 @@
-export interface QuoteInfoResponse {
+export interface QuoteInfoResponseDto {
   symbol: string;
   currency: string;
   twoHundredDayAverage: number;

@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { RootResult } from './dto/root-result.dto';
-import { QuoteInfoResponse } from './dto/quote-info-response.dto';
+import { RootResultDto } from './dto/root-result.dto';
+import { QuoteInfoResponseDto } from './dto/quote-info-response.dto';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
 import { ConfigService } from '@nestjs/config';
+import {
+  TesouroDiretoResponseDto,
+  TreasureBondDto,
+} from './dto/tesouro-direto-response.dto';
 
 @Injectable()
 export class CotacaoService {
@@ -16,10 +20,10 @@ export class CotacaoService {
     this._token = this.configService.get<string>('BRAPI_TOKEN');
   }
 
-  async getQuoteInformation(quote: string): Promise<QuoteInfoResponse> {
+  async getQuoteInformation(quote: string): Promise<QuoteInfoResponseDto> {
     const { data: rootResult } = await firstValueFrom(
       this.httpService
-        .get<RootResult<QuoteInfoResponse>>(
+        .get<RootResultDto<QuoteInfoResponseDto>>(
           `https://brapi.dev/api/quote/${quote}?token=${this._token}`,
         )
         .pipe(
@@ -31,5 +35,28 @@ export class CotacaoService {
     );
 
     return rootResult.results[0];
+  }
+
+  async getTesouroInformation(codigo: string): Promise<TreasureBondDto> {
+    const { data: tesouroDiretoResponse } = await firstValueFrom(
+      this.httpService
+        .get<TesouroDiretoResponseDto>(
+          `https://www.tesourodireto.com.br/b3/tesourodireto/pricesAndFeesHistory?codigo=${codigo}&periodo=1`,
+          {
+            headers: {
+              Referer:
+                'https://www.tesourodireto.com.br/titulos/historico-de-precos-e-taxas.htm',
+            },
+          },
+        )
+        .pipe(
+          catchError((error: AxiosError) => {
+            console.error(error.response.data);
+            throw 'An error happened!';
+          }),
+        ),
+    );
+
+    return tesouroDiretoResponse.response.TrsrBd;
   }
 }
