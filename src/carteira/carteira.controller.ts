@@ -17,6 +17,12 @@ export class CarteiraController {
   async getCarteira(): Promise<
     (CarteiraRendaVariavelDto | CarteiraRendaFixaDto)[]
   > {
-    return await this.carteiraService.calculateCarteira();
+    const carteira = await this.carteiraService.calculateCarteira();
+
+    return carteira.sort((a, b) => {
+      const nameA = a instanceof CarteiraRendaVariavelDto ? a.ticker : a.titulo;
+      const nameB = b instanceof CarteiraRendaVariavelDto ? b.ticker : b.titulo;
+      return nameA.toUpperCase().localeCompare(nameB);
+    });
   }
 }
