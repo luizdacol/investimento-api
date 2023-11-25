@@ -16,6 +16,7 @@ export class CarteiraRendaVariavelDto {
   dividendosRecebidos: number = 0;
   dividendosProvisionados: number = 0;
   dividendosRecebidosPorUnidade: number = 0;
+  dataHoraCotacao: Date;
 
   @Expose()
   get precoMedioTotal(): number {

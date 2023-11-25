@@ -83,6 +83,7 @@ export class CarteiraService {
       totalDoTipo.precoMercado += ativo.precoMercadoTotal;
       totalDoTipo.composicao += ativo.composicao;
       totalDoTipo.composicaoTotal += ativo.composicaoTotal;
+      totalDoTipo.dataHoraCotacao = new Date();
 
       if (
         totalDoTipo instanceof CarteiraRendaVariavelDto &&
@@ -148,6 +149,7 @@ export class CarteiraService {
       );
 
     ativoNaCarteira.precoMercado = ativo.cotacao || 0;
+    ativoNaCarteira.dataHoraCotacao = ativo.dataHoraCotacao;
     ativoNaCarteira.dividendosProvisionados =
       resumoProventos.proventosProvisionados;
     ativoNaCarteira.dividendosRecebidos = resumoProventos.proventosRecebidos;
@@ -178,6 +180,7 @@ export class CarteiraService {
         : 0;
 
     ativoNaCarteira.precoMercado = ativo.cotacao || 0;
+    ativoNaCarteira.dataHoraCotacao = ativo.dataHoraCotacao || new Date();
 
     return ativoNaCarteira;
   }

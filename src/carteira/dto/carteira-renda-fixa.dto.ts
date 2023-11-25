@@ -12,6 +12,7 @@ export class CarteiraRendaFixaDto {
   precoMercado: number = 0;
   composicao: number = 0;
   composicaoTotal: number = 0;
+  dataHoraCotacao: Date;
 
   @Expose()
   get precoMedioTotal(): number {
