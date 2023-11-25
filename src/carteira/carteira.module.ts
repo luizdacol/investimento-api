@@ -3,10 +3,11 @@ import { CarteiraService } from './carteira.service';
 import { CarteiraController } from './carteira.controller';
 import { RendaVariavelModule } from 'src/renda-variavel/renda-variavel.module';
 import { RendaFixaModule } from 'src/renda-fixa/renda-fixa.module';
+import { GraficosController } from './controllers/graficos.controller';
 
 @Module({
   imports: [RendaVariavelModule, RendaFixaModule],
-  controllers: [CarteiraController],
+  controllers: [CarteiraController, GraficosController],
   providers: [CarteiraService],
 })
 export class CarteiraModule {}
