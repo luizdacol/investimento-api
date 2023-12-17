@@ -39,6 +39,7 @@ export class ProventosController {
     @Param('id') id: string,
     @Body() updateProventoDto: UpdateProventoDto,
   ) {
+    console.log('[PATCH][Proventos] Incoming request: ', updateProventoDto);
     return this.proventosService.update(+id, updateProventoDto);
   }
 

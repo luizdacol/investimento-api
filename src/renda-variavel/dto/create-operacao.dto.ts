@@ -1,20 +1,23 @@
+import { Transform, Type } from 'class-transformer';
 import {
-  IsDateString,
   IsNumber,
   IsInt,
   IsEnum,
   IsNotEmpty,
   IsString,
+  IsDate,
 } from 'class-validator';
 import { TipoAtivo } from 'src/enums/tipo-ativo.enum';
 import { TipoOperacao } from 'src/enums/tipo-operacao.enum';
 
 export class CreateOperacaoDto {
-  @IsDateString()
+  @IsDate()
+  @Type(() => Date)
   data: Date;
 
   @IsNotEmpty()
   @IsString()
+  @Transform((param) => param.value.toUpperCase())
   ticker: string;
 
   @IsEnum(TipoAtivo)

@@ -39,6 +39,10 @@ export class OperacoesController {
     @Param('id') id: string,
     @Body() updateRendaVariavelDto: UpdateOperacaoDto,
   ): Promise<boolean> {
+    console.log(
+      '[PATCH][Operacoes] Incoming request: ',
+      updateRendaVariavelDto,
+    );
     return this.rendaVariavelService.update(+id, updateRendaVariavelDto);
   }
 

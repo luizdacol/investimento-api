@@ -1,4 +1,4 @@
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsNotEmpty,
   IsString,
@@ -19,6 +19,7 @@ export class CreateProventoDto {
 
   @IsNotEmpty()
   @IsString()
+  @Transform((param) => param.value.toUpperCase())
   ticker: string;
 
   @IsEnum(TipoProvento)
