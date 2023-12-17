@@ -10,3 +10,12 @@ services:
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
+
+  api-investimento:
+    build: .
+    ports:
+      - 3001:3001
+    environment:
+      - DB_HOST=db-investimento
+    depends_on:
+      - db-investimento
