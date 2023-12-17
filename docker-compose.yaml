@@ -22,5 +22,14 @@ services:
     depends_on:
       - db-investimento
 
+  app-investimento:
+    build:
+      context: ../investimentos
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    depends_on:
+      - api-investimento
+
 volumes:
   pgdata:
