@@ -10,6 +10,8 @@ services:
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
+    volumes:
+      - pgdata:/var/lib/postgresql/data
 
   api-investimento:
     build: .
@@ -19,3 +21,6 @@ services:
       - DB_HOST=db-investimento
     depends_on:
       - db-investimento
+
+volumes:
+  pgdata:
