@@ -5,6 +5,7 @@ import {
   IsEnum,
   IsNumber,
   IsDate,
+  IsOptional,
 } from 'class-validator';
 import { TipoAtivo } from 'src/enums/tipo-ativo.enum';
 
@@ -17,12 +18,15 @@ export class CreateAtivoDto {
   tipo?: TipoAtivo;
 
   @IsString()
+  @IsOptional()
   codigo?: string;
 
   @IsNumber()
+  @IsOptional()
   cotacao?: number;
 
   @IsDate()
   @Type(() => Date)
+  @IsOptional()
   dataHoraCotacao?: Date;
 }
