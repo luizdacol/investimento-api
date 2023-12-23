@@ -19,6 +19,12 @@ export class AtivosService {
     return ativos;
   }
 
+  async findOne(id: number): Promise<Ativo> {
+    return await this._ativosRepository.findOne({
+      where: { id: id },
+    });
+  }
+
   async getOrCreate(ativoToSearch: CreateAtivoDto): Promise<Ativo> {
     let ativo = await this._ativosRepository.findOneBy({
       ticker: ativoToSearch.ticker,
@@ -28,6 +34,16 @@ export class AtivosService {
       ativo = await this._ativosRepository.save(ativoToSearch);
     }
     return ativo;
+  }
+
+  async create(createAtivoDto: CreateAtivoDto): Promise<Ativo> {
+    const ativo = await this._ativosRepository.findOneBy({
+      ticker: createAtivoDto.ticker,
+    });
+    if (ativo) throw Error('Ativo já cadastrado');
+
+    const ativoSaved = await this._ativosRepository.save(createAtivoDto);
+    return ativoSaved;
   }
 
   async update(id: number, updateAtivoDto: UpdateAtivoDto) {
@@ -44,6 +60,11 @@ export class AtivosService {
       ativo.dataHoraCotacao = updateAtivoDto.dataHoraCotacao;
 
     const result = await this._ativosRepository.update({ id: id }, ativo);
+    return result.affected > 0;
+  }
+
+  async remove(id: number): Promise<boolean> {
+    const result = await this._ativosRepository.delete({ id: id });
     return result.affected > 0;
   }
 }
