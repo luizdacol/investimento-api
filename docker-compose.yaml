@@ -31,5 +31,15 @@ services:
     depends_on:
       - api-investimento
 
+  db-investimento-dev:
+    container_name: db-investimento-dev
+    image: postgres:15.4
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+
 volumes:
   pgdata:
