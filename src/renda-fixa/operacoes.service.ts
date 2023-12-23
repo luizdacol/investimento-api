@@ -16,11 +16,10 @@ export class OperacoesService {
   ) {}
 
   async create(createOperacaoDto: CreateOperacaoDto) {
-    const ativo = await this._ativosService.getOrCreate({
-      titulo: createOperacaoDto.titulo,
-      tipo: createOperacaoDto.tipoAtivo,
-      codigo: createOperacaoDto.codigo,
-    });
+    const ativo = await this._ativosService.findByTitulo(
+      createOperacaoDto.titulo,
+    );
+    if (!ativo) throw Error('Ativo não encontrado');
 
     const operacaoSaved = this.operacoesRepository.save({
       data: createOperacaoDto.data,

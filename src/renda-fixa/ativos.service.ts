@@ -25,15 +25,10 @@ export class AtivosService {
     });
   }
 
-  async getOrCreate(ativoToSearch: Partial<Ativo>): Promise<Ativo> {
-    let ativo = await this._ativosRepository.findOneBy({
-      titulo: ativoToSearch.titulo,
+  async findByTitulo(titulo: string): Promise<Ativo> {
+    return await this._ativosRepository.findOne({
+      where: { titulo: titulo },
     });
-
-    if (!ativo) {
-      ativo = await this._ativosRepository.save(ativoToSearch);
-    }
-    return ativo;
   }
 
   async create(createAtivoDto: CreateAtivoDto): Promise<Ativo> {
