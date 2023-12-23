@@ -1,4 +1,4 @@
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsNotEmpty,
   IsString,
@@ -12,6 +12,7 @@ import { TipoAtivo } from 'src/enums/tipo-ativo.enum';
 export class CreateAtivoDto {
   @IsString()
   @IsNotEmpty()
+  @Transform((param) => param.value.toUpperCase())
   ticker: string;
 
   @IsEnum(TipoAtivo)

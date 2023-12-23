@@ -7,7 +7,6 @@ import {
   IsString,
   IsDate,
 } from 'class-validator';
-import { TipoAtivo } from 'src/enums/tipo-ativo.enum';
 import { TipoOperacao } from 'src/enums/tipo-operacao.enum';
 
 export class CreateOperacaoDto {
@@ -19,12 +18,6 @@ export class CreateOperacaoDto {
   @IsString()
   @Transform((param) => param.value.toUpperCase())
   ticker: string;
-
-  @IsEnum(TipoAtivo)
-  tipoAtivo: TipoAtivo;
-
-  @IsString()
-  segmento?: string;
 
   @IsNumber()
   precoUnitario: number;

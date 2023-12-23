@@ -25,15 +25,10 @@ export class AtivosService {
     });
   }
 
-  async getOrCreate(ativoToSearch: CreateAtivoDto): Promise<Ativo> {
-    let ativo = await this._ativosRepository.findOneBy({
-      ticker: ativoToSearch.ticker,
+  async findByTicker(ticker: string): Promise<Ativo> {
+    return await this._ativosRepository.findOne({
+      where: { ticker: ticker },
     });
-
-    if (!ativo) {
-      ativo = await this._ativosRepository.save(ativoToSearch);
-    }
-    return ativo;
   }
 
   async create(createAtivoDto: CreateAtivoDto): Promise<Ativo> {

@@ -29,9 +29,10 @@ export class ProventosService {
   }
 
   async create(createProventoDto: CreateProventoDto) {
-    const ativo = await this._ativosService.getOrCreate({
-      ticker: createProventoDto.ticker,
-    });
+    const ativo = await this._ativosService.findByTicker(
+      createProventoDto.ticker,
+    );
+    if (!ativo) throw Error('Ativo não encontrado');
 
     const valorLiquido = this.calcularValorLiquido(
       createProventoDto.valorBruto,
