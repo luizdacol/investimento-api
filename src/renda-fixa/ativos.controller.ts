@@ -49,21 +49,6 @@ export class AtivosController {
     return this._ativosService.create(createAtivoDto);
   }
 
-  @Patch(':id')
-  async update(
-    @Param('id') id: string,
-    @Body() updateAtivoDto: UpdateAtivoDto,
-  ): Promise<boolean> {
-    console.log('[PATCH][Ativos] Incoming request: ', updateAtivoDto);
-    return this._ativosService.update(+id, updateAtivoDto);
-  }
-
-  @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('id') id: string): Promise<boolean> {
-    return await this._ativosService.remove(+id);
-  }
-
   @Patch('/update-prices')
   async updatePrices(): Promise<boolean> {
     const ativos = await this._ativosService.findAll();
@@ -84,5 +69,20 @@ export class AtivosController {
     });
 
     return true;
+  }
+
+  @Patch(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() updateAtivoDto: UpdateAtivoDto,
+  ): Promise<boolean> {
+    console.log('[PATCH][Ativos] Incoming request: ', updateAtivoDto);
+    return this._ativosService.update(+id, updateAtivoDto);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async remove(@Param('id') id: string): Promise<boolean> {
+    return await this._ativosService.remove(+id);
   }
 }
