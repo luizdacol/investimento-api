@@ -17,6 +17,8 @@
     "migrations:new": "ts-node ./node_modules/typeorm/cli migration:create",
     "pg:dump": "docker exec -i db-investimento /bin/bash -c \"PGPASSWORD=password pg_dump --username postgres --data-only --exclude-table-data=migrations --encoding=UTF8 postgres\" > ./data-dump.sql",
     "pg:restore": "docker exec -i db-investimento /bin/bash -c \"PGPASSWORD=password psql --username postgres postgres\" < ./data-dump.sql",
+    "app:deploy": "docker compose build",
+    "app:start": "docker compose up -d app-investimento && docker compose logs -f api-investimento",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
