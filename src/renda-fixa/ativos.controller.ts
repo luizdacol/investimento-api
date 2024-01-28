@@ -42,7 +42,7 @@ export class AtivosController {
         createAtivoDto.codigo,
       );
 
-      createAtivoDto.cotacao = cotacao.PrcgLst.at(-1).untrRedVal;
+      createAtivoDto.cotacao = cotacao.Pricg.untrRedVal;
       createAtivoDto.dataHoraCotacao = new Date();
     }
 
@@ -63,7 +63,7 @@ export class AtivosController {
         (ativo) => ativo.codigo === cotacao.cd.toString(),
       );
       this._ativosService.update(ativo.id, {
-        cotacao: cotacao.PrcgLst.at(-1).untrRedVal,
+        cotacao: cotacao.Pricg.untrRedVal,
         dataHoraCotacao: new Date(),
       });
     });

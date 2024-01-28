@@ -7,6 +7,7 @@ export interface TesouroDiretoResponseDto {
 
 export interface ResponseDto {
   TrsrBd: TreasureBondDto;
+  TrsrBondMkt: TreasureBondMarketDto;
 }
 
 export interface TreasureBondDto {
@@ -17,11 +18,10 @@ export interface TreasureBondDto {
   invstmtStbl: string;
   rcvgIncm: string;
   wdwlDt: string;
-  PrcgLst: PrcgLstDto[];
+  Pricg: PrcgLstDto;
 }
 
 export interface PrcgLstDto {
-  TrsrBdMkt: TreasureBondMarketDto;
   untrInvstmtVal: number;
   anulInvstmtRate: number;
   untrRedVal: number;
@@ -29,6 +29,8 @@ export interface PrcgLstDto {
 }
 
 export interface TreasureBondMarketDto {
+  sts: string;
+  qtnDtTm: string;
   opngDtTm: string;
   clsgDtTm: string;
 }

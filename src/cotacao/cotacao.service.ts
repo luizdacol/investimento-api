@@ -41,7 +41,7 @@ export class CotacaoService {
     const { data: tesouroDiretoResponse } = await firstValueFrom(
       this.httpService
         .get<TesouroDiretoResponseDto>(
-          `https://www.tesourodireto.com.br/b3/tesourodireto/pricesAndFeesHistory?codigo=${codigo}&periodo=1`,
+          `https://www.tesourodireto.com.br/b3/tesourodireto/treasuryBondDetail?codigo=${codigo}`,
           {
             headers: {
               Referer:
