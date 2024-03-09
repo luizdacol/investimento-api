@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateProventoDto } from '../renda-variavel/dto/create-provento.dto';
 import { UpdateProventoDto } from './dto/update-provento.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { Provento } from './entities/provento.entity';
 import { Ativo } from './entities/ativo.entity';
 import { TipoProvento } from 'src/enums/tipo-provento';
@@ -63,6 +63,17 @@ export class ProventosService {
   async findAll(): Promise<Provento[]> {
     const proventos = await this.proventosRepository.find({
       relations: { ativo: true },
+      order: { dataPagamento: 'DESC' },
+    });
+    return proventos;
+  }
+
+  async findWithFilters(
+    filters: FindOptionsWhere<Provento>,
+  ): Promise<Provento[]> {
+    const proventos = await this.proventosRepository.find({
+      relations: { ativo: true },
+      where: filters,
       order: { dataPagamento: 'DESC' },
     });
     return proventos;

@@ -10,13 +10,19 @@ import { Provento } from './entities/provento.entity';
 import { AtivosService } from './ativos.service';
 import { CotacaoModule } from 'src/cotacao/cotacao.module';
 import { AtivosController } from './ativos.controller';
+import { GraficosController } from './graficos.controller';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Ativo, Operacao, Provento]),
     CotacaoModule,
   ],
-  controllers: [OperacoesController, ProventosController, AtivosController],
+  controllers: [
+    OperacoesController,
+    ProventosController,
+    AtivosController,
+    GraficosController,
+  ],
   providers: [OperacoesService, ProventosService, AtivosService],
   exports: [OperacoesService, AtivosService, ProventosService],
 })
