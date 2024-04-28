@@ -56,7 +56,7 @@ export class CarteiraService {
         );
       }
 
-      carteira.push(ativoNaCarteira);
+      if (ativoNaCarteira.quantidade > 0) carteira.push(ativoNaCarteira);
     }
 
     this.calculateComposicao(carteira);
