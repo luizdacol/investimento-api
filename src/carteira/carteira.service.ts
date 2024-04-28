@@ -25,12 +25,14 @@ export class CarteiraService {
   ) {}
 
   async calculateCarteira() {
-    const operacoesRV = await this._operacoesRendaVariavelService.findAll();
-    const ativosRV = await this._ativosRendaVariavelService.findAll({});
-    const proventosRV = await this._proventosRendaVariavelService.findAll();
-
-    const operacoesRF = await this._operacoesRendaFixaService.findAll();
-    const ativosRF = await this._ativosRendaFixaService.findAll({});
+    const [operacoesRV, ativosRV, proventosRV, operacoesRF, ativosRF] =
+      await Promise.all([
+        this._operacoesRendaVariavelService.findAll(),
+        this._ativosRendaVariavelService.findAll({}),
+        this._proventosRendaVariavelService.findAll(),
+        this._operacoesRendaFixaService.findAll(),
+        this._ativosRendaFixaService.findAll({}),
+      ]);
 
     const arrayAtivos = new Array<AtivoRendaVariavel | AtivoRendaFixa>(
       ...ativosRF,
