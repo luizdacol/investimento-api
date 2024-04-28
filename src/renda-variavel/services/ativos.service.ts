@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, Repository } from 'typeorm';
-import { Ativo } from './entities/ativo.entity';
-import { UpdateAtivoDto } from './dto/update-ativo.dto';
-import { CreateAtivoDto } from './dto/create-ativo.dto';
+import { Ativo } from '../entities/ativo.entity';
+import { UpdateAtivoDto } from '../dto/update-ativo.dto';
+import { CreateAtivoDto } from '../dto/create-ativo.dto';
 
 @Injectable()
 export class AtivosService {

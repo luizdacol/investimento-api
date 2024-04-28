@@ -9,7 +9,7 @@ import { CarteiraRendaVariavelDto } from '../dto/carteira-renda-variavel.dto';
 import { CarteiraRendaFixaDto } from '../dto/carteira-renda-fixa.dto';
 import { TipoAtivo } from 'src/enums/tipo-ativo.enum';
 import { ComposicaoChartDto } from '../dto/composicao-chart.dto';
-import { ProventosService } from 'src/renda-variavel/proventos.service';
+import { ProventosService } from 'src/renda-variavel/services/proventos.service';
 import { ProventosChartDto } from '../dto/proventos-chart.dto';
 import { Provento } from 'src/renda-variavel/entities/provento.entity';
 

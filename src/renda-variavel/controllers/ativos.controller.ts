@@ -9,11 +9,11 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { AtivosService } from './ativos.service';
+import { AtivosService } from '../services/ativos.service';
 import { CotacaoService } from 'src/cotacao/cotacao.service';
-import { Ativo } from './entities/ativo.entity';
-import { CreateAtivoDto } from './dto/create-ativo.dto';
-import { UpdateAtivoDto } from './dto/update-ativo.dto';
+import { Ativo } from '../entities/ativo.entity';
+import { CreateAtivoDto } from '../dto/create-ativo.dto';
+import { UpdateAtivoDto } from '../dto/update-ativo.dto';
 
 @Controller('v1/renda-variavel/ativos')
 export class AtivosController {

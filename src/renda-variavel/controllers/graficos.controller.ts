@@ -1,8 +1,8 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { ProventosService } from './proventos.service';
-import { Provento } from './entities/provento.entity';
+import { ProventosService } from '../services/proventos.service';
+import { Provento } from '../entities/provento.entity';
 import { Between, FindOptionsWhere } from 'typeorm';
-import { ProventoComposicaoChartDto } from './dto/provento-composicao-chart.dto';
+import { ProventoComposicaoChartDto } from '../dto/provento-composicao-chart.dto';
 
 @Controller('v1/renda-variavel/graficos')
 export class GraficosController {

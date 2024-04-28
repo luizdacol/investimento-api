@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { CreateOperacaoDto } from './dto/create-operacao.dto';
-import { UpdateOperacaoDto } from './dto/update-operacao.dto';
+import { CreateOperacaoDto } from '../dto/create-operacao.dto';
+import { UpdateOperacaoDto } from '../dto/update-operacao.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsOrder, FindOptionsWhere, Repository } from 'typeorm';
-import { Operacao } from './entities/operacao.entity';
+import { Operacao } from '../entities/operacao.entity';
 import { TipoOperacao } from 'src/enums/tipo-operacao.enum';
 import { AtivosService } from './ativos.service';
 

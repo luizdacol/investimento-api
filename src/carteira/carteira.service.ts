@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { OperacoesService as OperacoesRendaVariavelService } from 'src/renda-variavel/operacoes.service';
+import { OperacoesService as OperacoesRendaVariavelService } from 'src/renda-variavel/services/operacoes.service';
 import { CarteiraRendaVariavelDto } from './dto/carteira-renda-variavel.dto';
-import { AtivosService as AtivosRendaVariavelService } from 'src/renda-variavel/ativos.service';
-import { ProventosService as ProventosRendaVariavelService } from 'src/renda-variavel/proventos.service';
+import { AtivosService as AtivosRendaVariavelService } from 'src/renda-variavel/services/ativos.service';
+import { ProventosService as ProventosRendaVariavelService } from 'src/renda-variavel/services/proventos.service';
 import { OperacoesService as OperacoesRendaFixaService } from 'src/renda-fixa/operacoes.service';
 import { AtivosService as AtivosRendaFixaService } from 'src/renda-fixa/ativos.service';
 import { CarteiraRendaFixaDto } from './dto/carteira-renda-fixa.dto';

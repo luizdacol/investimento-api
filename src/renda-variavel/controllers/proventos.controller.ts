@@ -9,10 +9,10 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ProventosService } from './proventos.service';
-import { CreateProventoDto } from './dto/create-provento.dto';
-import { UpdateProventoDto } from './dto/update-provento.dto';
-import { Provento } from './entities/provento.entity';
+import { ProventosService } from '../services/proventos.service';
+import { CreateProventoDto } from '../dto/create-provento.dto';
+import { UpdateProventoDto } from '../dto/update-provento.dto';
+import { Provento } from '../entities/provento.entity';
 
 @Controller('v1/renda-variavel/proventos')
 export class ProventosController {

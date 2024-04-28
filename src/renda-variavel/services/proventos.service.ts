@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { CreateProventoDto } from '../renda-variavel/dto/create-provento.dto';
-import { UpdateProventoDto } from './dto/update-provento.dto';
+import { CreateProventoDto } from '../dto/create-provento.dto';
+import { UpdateProventoDto } from '../dto/update-provento.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, Repository } from 'typeorm';
-import { Provento } from './entities/provento.entity';
-import { Ativo } from './entities/ativo.entity';
+import { Provento } from '../entities/provento.entity';
+import { Ativo } from '../entities/ativo.entity';
 import { TipoProvento } from 'src/enums/tipo-provento';
 import { OperacoesService } from './operacoes.service';
 import { AtivosService } from './ativos.service';
