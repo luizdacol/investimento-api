@@ -4,7 +4,7 @@ import {
   Get,
   UseInterceptors,
 } from '@nestjs/common';
-import { CarteiraService } from '../carteira.service';
+import { CarteiraService } from '../services/carteira.service';
 import { CarteiraRendaVariavelDto } from '../dto/carteira-renda-variavel.dto';
 import { CarteiraRendaFixaDto } from '../dto/carteira-renda-fixa.dto';
 import { TipoAtivo } from 'src/enums/tipo-ativo.enum';

@@ -5,9 +5,9 @@ import {
   Query,
   UseInterceptors,
 } from '@nestjs/common';
-import { CarteiraService } from './carteira.service';
-import { CarteiraRendaVariavelDto } from './dto/carteira-renda-variavel.dto';
-import { CarteiraRendaFixaDto } from './dto/carteira-renda-fixa.dto';
+import { CarteiraService } from '../services/carteira.service';
+import { CarteiraRendaVariavelDto } from '../dto/carteira-renda-variavel.dto';
+import { CarteiraRendaFixaDto } from '../dto/carteira-renda-fixa.dto';
 
 @Controller('v1/carteira')
 export class CarteiraController {
