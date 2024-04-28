@@ -2,6 +2,7 @@ import {
   ClassSerializerInterceptor,
   Controller,
   Get,
+  Query,
   UseInterceptors,
 } from '@nestjs/common';
 import { CarteiraService } from './carteira.service';
@@ -14,10 +15,12 @@ export class CarteiraController {
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
-  async getCarteira(): Promise<
-    (CarteiraRendaVariavelDto | CarteiraRendaFixaDto)[]
-  > {
-    const carteira = await this.carteiraService.calculateCarteira();
+  async getCarteira(
+    @Query('dataDeCorte') dataDeCorte?: string,
+  ): Promise<(CarteiraRendaVariavelDto | CarteiraRendaFixaDto)[]> {
+    const carteira = await this.carteiraService.calculateCarteira(
+      dataDeCorte ? new Date(dataDeCorte) : new Date(),
+    );
 
     return carteira.sort((a, b) => {
       const nameA = a instanceof CarteiraRendaVariavelDto ? a.ticker : a.titulo;

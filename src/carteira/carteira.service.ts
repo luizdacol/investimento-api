@@ -24,7 +24,7 @@ export class CarteiraService {
     private readonly _ativosRendaFixaService: AtivosRendaFixaService,
   ) {}
 
-  async calculateCarteira() {
+  async calculateCarteira(dataDeCorte: Date = new Date()) {
     const [operacoesRV, ativosRV, proventosRV, operacoesRF, ativosRF] =
       await Promise.all([
         this._operacoesRendaVariavelService.findAll(),
@@ -46,11 +46,14 @@ export class CarteiraService {
       if (ativo instanceof AtivoRendaVariavel) {
         ativoNaCarteira = this.calculateAtivoRV(
           ativo,
-          operacoesRV,
-          proventosRV,
+          operacoesRV.filter((d) => d.data <= dataDeCorte),
+          proventosRV.filter((d) => d.dataCom <= dataDeCorte),
         );
       } else {
-        ativoNaCarteira = this.calculateAtivoRF(ativo, operacoesRF);
+        ativoNaCarteira = this.calculateAtivoRF(
+          ativo,
+          operacoesRF.filter((d) => d.data <= dataDeCorte),
+        );
       }
 
       carteira.push(ativoNaCarteira);
