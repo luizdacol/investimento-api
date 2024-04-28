@@ -9,10 +9,10 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { OperacoesService } from './operacoes.service';
-import { CreateOperacaoDto } from './dto/create-operacao.dto';
-import { UpdateOperacaoDto } from './dto/update-operacao.dto';
-import { ResponseOperacao } from './dto/response-operacao.dto';
+import { OperacoesService } from '../services/operacoes.service';
+import { CreateOperacaoDto } from '../dto/create-operacao.dto';
+import { UpdateOperacaoDto } from '../dto/update-operacao.dto';
+import { ResponseOperacao } from '../dto/response-operacao.dto';
 
 @Controller('v1/renda-fixa/operacoes')
 export class OperacoesController {

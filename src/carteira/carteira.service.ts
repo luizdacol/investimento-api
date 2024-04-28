@@ -3,8 +3,8 @@ import { OperacoesService as OperacoesRendaVariavelService } from 'src/renda-var
 import { CarteiraRendaVariavelDto } from './dto/carteira-renda-variavel.dto';
 import { AtivosService as AtivosRendaVariavelService } from 'src/renda-variavel/services/ativos.service';
 import { ProventosService as ProventosRendaVariavelService } from 'src/renda-variavel/services/proventos.service';
-import { OperacoesService as OperacoesRendaFixaService } from 'src/renda-fixa/operacoes.service';
-import { AtivosService as AtivosRendaFixaService } from 'src/renda-fixa/ativos.service';
+import { OperacoesService as OperacoesRendaFixaService } from 'src/renda-fixa/services/operacoes.service';
+import { AtivosService as AtivosRendaFixaService } from 'src/renda-fixa/services/ativos.service';
 import { CarteiraRendaFixaDto } from './dto/carteira-renda-fixa.dto';
 import { Ativo as AtivoRendaVariavel } from 'src/renda-variavel/entities/ativo.entity';
 import { Ativo as AtivoRendaFixa } from 'src/renda-fixa/entities/ativo.entity';
