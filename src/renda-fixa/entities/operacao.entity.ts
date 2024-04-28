@@ -8,13 +8,16 @@ import {
 import { Ativo } from './ativo.entity';
 import { TipoOperacao } from 'src/enums/tipo-operacao.enum';
 import { ColumnNumericTransformer } from 'src/transformers/ColumnNumericTransformer';
+import { DateTransformer } from 'src/transformers/DateTransformer';
 
 @Entity('operacoes_renda_fixa')
 export class Operacao {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column('date')
+  @Column('date', {
+    transformer: new DateTransformer(),
+  })
   data: Date;
 
   @ManyToOne(() => Ativo, (ativo) => ativo.id)
@@ -41,6 +44,7 @@ export class Operacao {
 
   @Column('date', {
     name: 'data_vencimento',
+    transformer: new DateTransformer(),
   })
   dataVencimento: Date;
 

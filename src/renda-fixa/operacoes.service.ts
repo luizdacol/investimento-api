@@ -117,9 +117,6 @@ export class OperacoesService {
   }
 
   private filtroPorTituloEData(o: Operacao, titulo: string, dataBase: Date) {
-    return (
-      o.ativo.titulo === titulo &&
-      o.data.toString() <= dataBase.toISOString().substring(0, 10)
-    );
+    return o.ativo.titulo === titulo && o.data <= dataBase;
   }
 }
