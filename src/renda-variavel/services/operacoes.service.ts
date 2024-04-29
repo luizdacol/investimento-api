@@ -6,6 +6,7 @@ import { FindOptionsOrder, FindOptionsWhere, Repository } from 'typeorm';
 import { Operacao } from '../entities/operacao.entity';
 import { TipoOperacao } from 'src/enums/tipo-operacao.enum';
 import { AtivosService } from './ativos.service';
+import { TaxasNegociacaoDto } from '../dto/taxas-negociacao.dto';
 
 @Injectable()
 export class OperacoesService {
@@ -77,6 +78,32 @@ export class OperacoesService {
   async remove(id: number): Promise<boolean> {
     const result = await this.operacoesRepository.delete({ id: id });
     return result.affected > 0;
+  }
+
+  async calcularTaxas(operacoes: Operacao[]): Promise<TaxasNegociacaoDto[]> {
+    const initialArray: TaxasNegociacaoDto[] = [];
+
+    const taxasNegociacaoDto = operacoes
+      .filter(
+        (op) =>
+          op.tipo === TipoOperacao.COMPRA || op.tipo === TipoOperacao.VENDA,
+      )
+      .reduce((negociacoes, op) => {
+        const item = negociacoes.find(
+          (n) => n.data.getTime() === op.data.getTime(),
+        );
+        if (item) item.valorTotal += op.precoTotal;
+        else {
+          const taxa = new TaxasNegociacaoDto();
+          taxa.data = op.data;
+          taxa.valorTotal = op.precoTotal;
+          negociacoes.push(taxa);
+        }
+
+        return negociacoes;
+      }, initialArray);
+
+    return taxasNegociacaoDto;
   }
 
   private calcularFatorDesdobramento(

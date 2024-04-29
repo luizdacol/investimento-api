@@ -8,13 +8,17 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  ClassSerializerInterceptor,
+  UseInterceptors,
 } from '@nestjs/common';
 import { OperacoesService } from '../services/operacoes.service';
 import { CreateOperacaoDto } from '../dto/create-operacao.dto';
 import { UpdateOperacaoDto } from '../dto/update-operacao.dto';
 import { Operacao } from '../entities/operacao.entity';
+import { TaxasNegociacaoDto } from '../dto/taxas-negociacao.dto';
 
 @Controller('v1/renda-variavel/operacoes')
+@UseInterceptors(ClassSerializerInterceptor)
 export class OperacoesController {
   constructor(private readonly rendaVariavelService: OperacoesService) {}
 
@@ -27,6 +31,13 @@ export class OperacoesController {
   @Get()
   findAll() {
     return this.rendaVariavelService.findAll(undefined, { data: 'DESC' });
+  }
+
+  @Get('taxas-impostos')
+  async obterTaxas(): Promise<TaxasNegociacaoDto[]> {
+    const operacoes = await this.rendaVariavelService.findAll();
+
+    return this.rendaVariavelService.calcularTaxas(operacoes);
   }
 
   @Get(':id')
