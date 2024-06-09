@@ -8,6 +8,7 @@ import { Ativo } from '../entities/ativo.entity';
 import { TipoProvento } from 'src/enums/tipo-provento';
 import { OperacoesService } from './operacoes.service';
 import { AtivosService } from './ativos.service';
+import { Operacao } from '../entities/operacao.entity';
 
 @Injectable()
 export class ProventosService {
@@ -123,6 +124,7 @@ export class ProventosService {
 
   calcularResumoProventos(
     proventos: Provento[],
+    operacoes: Operacao[],
     ticker: string,
     dataBase: Date = new Date(),
   ): {
@@ -130,6 +132,15 @@ export class ProventosService {
     proventosRecebidos: number;
     proventosProvisionados: number;
   } {
+    const fatorDesdobramentoPorData =
+      this.operacoesService.calcularFatorDesdobramentoPorData(
+        proventos
+          .filter((o) => o.ativo.ticker === ticker)
+          .map((o) => o.dataCom),
+        operacoes,
+        ticker,
+      );
+
     const proventosDoAtivo = proventos.filter((p) => p.ativo.ticker === ticker);
 
     return proventosDoAtivo.reduce(
@@ -138,7 +149,9 @@ export class ProventosService {
           proventoResumido.proventosProvisionados += proventoAtual.valorTotal;
         } else {
           proventoResumido.proventosRecebidos += proventoAtual.valorTotal;
-          proventoResumido.proventosPorAcao += proventoAtual.valorLiquido;
+          proventoResumido.proventosPorAcao +=
+            proventoAtual.valorLiquido /
+            fatorDesdobramentoPorData.get(proventoAtual.dataCom.toISOString());
         }
         return proventoResumido;
       },

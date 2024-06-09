@@ -149,6 +149,7 @@ export class CarteiraService {
     const resumoProventos =
       this._proventosRendaVariavelService.calcularResumoProventos(
         proventos,
+        operacoes,
         ativo.ticker,
         new Date(),
       );

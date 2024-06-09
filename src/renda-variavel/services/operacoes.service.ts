@@ -108,7 +108,8 @@ export class OperacoesService {
     );
   }
 
-  private calcularFatorDesdobramento(
+  public calcularFatorDesdobramentoPorData(
+    datasBase: Date[],
     operacoes: Operacao[],
     ticker: string,
   ): Map<string, number> {
@@ -118,12 +119,12 @@ export class OperacoesService {
     );
 
     return new Map(
-      operacoesDoAtivo.map((operacao) => {
+      datasBase.map((dataBase) => {
         const fatorDesdobramento = desdobramentosDoAtivo
-          .filter((d) => d.data >= operacao.data)
+          .filter((d) => d.data >= dataBase)
           .reduce<number>((fator, op) => fator * op.quantidade, 1);
 
-        return [operacao.data.toISOString(), fatorDesdobramento];
+        return [dataBase.toISOString(), fatorDesdobramento];
       }),
     );
   }
@@ -137,7 +138,8 @@ export class OperacoesService {
     precoTotal: number;
     posicao: number;
   } {
-    const fatorDesdobramentoPorData = this.calcularFatorDesdobramento(
+    const fatorDesdobramentoPorData = this.calcularFatorDesdobramentoPorData(
+      operacoes.filter((o) => o.ativo.ticker === ticker).map((o) => o.data),
       operacoes,
       ticker,
     );
