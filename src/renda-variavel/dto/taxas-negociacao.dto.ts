@@ -8,12 +8,12 @@ export class TaxasNegociacaoDto {
 
   @Expose()
   get emolumentos(): number {
-    return Math.round(this.valorTotal * 0.00005 * 100) / 100;
+    return Math.trunc(this.valorTotal * 0.00005 * 100) / 100;
   }
 
   @Expose()
   get taxaLiquidacao(): number {
-    return Math.round(this.valorTotal * 0.00025 * 100) / 100;
+    return Math.trunc(this.valorTotal * 0.00025 * 100) / 100;
   }
 
   @Expose()

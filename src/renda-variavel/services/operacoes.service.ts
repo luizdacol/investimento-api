@@ -103,7 +103,9 @@ export class OperacoesService {
         return negociacoes;
       }, initialArray);
 
-    return taxasNegociacaoDto;
+    return taxasNegociacaoDto.sort(
+      (a, b) => b.data.getTime() - a.data.getTime(),
+    );
   }
 
   private calcularFatorDesdobramento(
