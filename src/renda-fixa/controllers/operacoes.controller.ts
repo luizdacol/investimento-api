@@ -8,6 +8,8 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { OperacoesService } from '../services/operacoes.service';
 import { CreateOperacaoDto } from '../dto/create-operacao.dto';
@@ -15,6 +17,7 @@ import { UpdateOperacaoDto } from '../dto/update-operacao.dto';
 import { ResponseOperacao } from '../dto/response-operacao.dto';
 
 @Controller('v1/renda-fixa/operacoes')
+@UseInterceptors(ClassSerializerInterceptor)
 export class OperacoesController {
   constructor(private readonly rendaFixaService: OperacoesService) {}
 

@@ -1,15 +1,17 @@
+import { Type } from 'class-transformer';
 import {
-  IsDateString,
   IsNumber,
   IsEnum,
   IsNotEmpty,
   IsString,
   IsOptional,
+  IsDate,
 } from 'class-validator';
 import { TipoOperacao } from 'src/enums/tipo-operacao.enum';
 
 export class CreateOperacaoDto {
-  @IsDateString()
+  @IsDate()
+  @Type(() => Date)
   data: Date;
 
   @IsNotEmpty()
@@ -25,7 +27,8 @@ export class CreateOperacaoDto {
   @IsString()
   rentabilidade?: string;
 
-  @IsDateString()
+  @IsDate()
+  @Type(() => Date)
   dataVencimento: Date;
 
   @IsString()
