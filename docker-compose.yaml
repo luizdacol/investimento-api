@@ -24,7 +24,7 @@ services:
 
   app-investimento:
     build:
-      context: ../investimentos
+      context: ../investimento-web
       dockerfile: Dockerfile
     ports:
       - 3000:3000
