@@ -29,7 +29,9 @@ export class OperacoesController {
 
   @Get()
   async findAll(): Promise<ResponseOperacao[]> {
-    const operacoes = await this.rendaFixaService.findAll();
+    const operacoes = await this.rendaFixaService.findAll(undefined, {
+      data: 'DESC',
+    });
     return operacoes.map((op) => ResponseOperacao.fromDomain(op));
   }
 

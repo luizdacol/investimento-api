@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Operacao } from '../entities/operacao.entity';
 import { AtivosService } from './ativos.service';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindOptionsWhere } from 'typeorm';
+import { Repository, FindOptionsWhere, FindOptionsOrder } from 'typeorm';
 import { CreateOperacaoDto } from '../dto/create-operacao.dto';
 import { UpdateOperacaoDto } from '../dto/update-operacao.dto';
 import { TipoOperacao } from 'src/enums/tipo-operacao.enum';
@@ -36,11 +36,14 @@ export class OperacoesService {
     return operacaoSaved;
   }
 
-  async findAll(filters: FindOptionsWhere<Operacao> = {}) {
+  async findAll(
+    filters: FindOptionsWhere<Operacao> = {},
+    orderby: FindOptionsOrder<Operacao> = null,
+  ) {
     const operacoes = await this.operacoesRepository.find({
       where: filters,
       relations: { ativo: true },
-      order: { data: 'DESC' },
+      order: orderby || { data: 'ASC' },
     });
     return operacoes;
   }
