@@ -90,14 +90,19 @@ export class OperacoesService {
     titulo: string,
     dataBase: Date = new Date(),
   ): number {
-    const posicao = operacoes
-      .filter((o) => this.filtroPorTituloEData(o, titulo, dataBase))
-      .reduce((posicao, operacaoAtual) => {
-        if (operacaoAtual.tipo === TipoOperacao.COMPRA)
-          return posicao + operacaoAtual.quantidade;
-        else if (operacaoAtual.tipo === TipoOperacao.VENDA)
-          return posicao - operacaoAtual.quantidade;
-      }, 0);
+    const operacoesFiltradas = operacoes.filter((o) =>
+      this.filtroPorTituloEData(o, titulo, dataBase),
+    );
+
+    const operacoesComPosicaoAtualizada =
+      this.processarVenda(operacoesFiltradas);
+
+    const posicao = operacoesComPosicaoAtualizada.reduce(
+      (posicao, operacaoAtual) => {
+        return posicao + operacaoAtual.quantidade;
+      },
+      0,
+    );
 
     return posicao;
   }
@@ -107,16 +112,56 @@ export class OperacoesService {
     titulo: string,
     dataBase: Date = new Date(),
   ): number {
-    const valorTotal = operacoes
-      .filter((o) => this.filtroPorTituloEData(o, titulo, dataBase))
-      .reduce((valorTotal, operacaoAtual) => {
-        if (operacaoAtual.tipo === TipoOperacao.COMPRA)
-          return valorTotal + operacaoAtual.precoTotal;
-        else if (operacaoAtual.tipo === TipoOperacao.VENDA)
-          return valorTotal - operacaoAtual.precoTotal;
-      }, 0);
+    const operacoesFiltradas = operacoes.filter((o) =>
+      this.filtroPorTituloEData(o, titulo, dataBase),
+    );
+
+    const operacoesComPosicaoAtualizada =
+      this.processarVenda(operacoesFiltradas);
+
+    const valorTotal = operacoesComPosicaoAtualizada.reduce(
+      (valorTotal, operacaoAtual) => {
+        return valorTotal + operacaoAtual.precoTotal;
+      },
+      0,
+    );
 
     return valorTotal;
+  }
+
+  // A venda de titulos publicos é no formato PEPS (Primeiro que entra é Primeiro que sai)
+  // Portanto, para cada operação de venda, a primeira operação é atualizada de acordo com o que foi vendido
+  // Quando a quantidade zera, essa operação deixa de existir
+  // TODO: Cenario onde a quantidade da venda é maior que a primeira operação de compra
+  public processarVenda(
+    operacoes: Operacao[],
+  ): { quantidade: number; precoUnitario: number; precoTotal: number }[] {
+    const operacoesAtualizadas = operacoes
+      .filter((o) => o.tipo === TipoOperacao.COMPRA)
+      .map((o) => {
+        return {
+          quantidade: o.quantidade,
+          precoUnitario: o.precoUnitario,
+          precoTotal: o.precoTotal,
+        };
+      });
+
+    const operacoesVenda = operacoes.filter(
+      (o) => o.tipo === TipoOperacao.VENDA,
+    );
+
+    for (const venda of operacoesVenda) {
+      operacoesAtualizadas[0].quantidade -= venda.quantidade;
+
+      operacoesAtualizadas[0].precoTotal =
+        operacoesAtualizadas[0].quantidade *
+        operacoesAtualizadas[0].precoUnitario;
+
+      if (operacoesAtualizadas[0].quantidade === 0)
+        operacoesAtualizadas.shift();
+    }
+
+    return operacoesAtualizadas;
   }
 
   private filtroPorTituloEData(o: Operacao, titulo: string, dataBase: Date) {
