@@ -14,7 +14,6 @@ import { CotacaoService } from 'src/cotacao/cotacao.service';
 import { CreateAtivoDto } from '../dto/create-ativo.dto';
 import { UpdateAtivoDto } from '../dto/update-ativo.dto';
 import { Ativo } from '../entities/ativo.entity';
-import { TipoAtivo } from 'src/enums/tipo-ativo.enum';
 
 @Controller('v1/renda-fixa/ativos')
 export class AtivosController {
@@ -36,15 +35,6 @@ export class AtivosController {
   @Post()
   async create(@Body() createAtivoDto: CreateAtivoDto) {
     console.log('[POST][Ativos] Incoming request: ', createAtivoDto);
-
-    if (createAtivoDto.tipo === TipoAtivo.TESOURO_DIRETO) {
-      const cotacao = await this._cotacaoService.getTesouroInformation(
-        createAtivoDto.codigo,
-      );
-
-      createAtivoDto.cotacao = cotacao.Pricg.untrRedVal;
-      createAtivoDto.dataHoraCotacao = new Date();
-    }
 
     return this._ativosService.create(createAtivoDto);
   }
