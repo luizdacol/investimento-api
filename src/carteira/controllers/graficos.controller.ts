@@ -2,16 +2,21 @@ import {
   ClassSerializerInterceptor,
   Controller,
   Get,
+  Param,
   UseInterceptors,
 } from '@nestjs/common';
 import { CarteiraService } from '../services/carteira.service';
 import { CarteiraRendaVariavelDto } from '../dto/carteira-renda-variavel.dto';
 import { CarteiraRendaFixaDto } from '../dto/carteira-renda-fixa.dto';
-import { TipoAtivo } from 'src/enums/tipo-ativo.enum';
-import { ComposicaoChartDto } from '../dto/composicao-chart.dto';
-import { ProventosService } from 'src/renda-variavel/services/proventos.service';
+import { TipoAtivo } from '../../enums/tipo-ativo.enum';
+import {
+  ComposicaoChartDto,
+  ComposicaoV2ChartDto,
+} from '../dto/composicao-chart.dto';
+import { ProventosService } from '../../renda-variavel/services/proventos.service';
 import { ProventosChartDto } from '../dto/proventos-chart.dto';
-import { Provento } from 'src/renda-variavel/entities/provento.entity';
+import { Provento } from '../../renda-variavel/entities/provento.entity';
+import { toRounded } from '../../utils/helper';
 
 @Controller('v1/graficos')
 export class GraficosController {
@@ -57,6 +62,34 @@ export class GraficosController {
     );
 
     return composicaoDto;
+  }
+
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get('composicao/:categoria')
+  async getComposicao(
+    @Param('categoria') categoria: string,
+  ): Promise<ComposicaoV2ChartDto[]> {
+    const carteira = await this.carteiraService.calculateCarteira();
+
+    if (categoria !== 'carteira') {
+      return carteira
+        .filter((c) => c.tipoAtivo === categoria && c.nome !== 'Total')
+        .map((c) => {
+          return {
+            name: c.nome,
+            value: toRounded(c.composicao),
+          };
+        });
+    } else {
+      return carteira
+        .filter((c) => c.nome === 'Total' && c.composicaoTotal !== 0)
+        .map((c) => {
+          return {
+            name: c.tipoAtivo,
+            value: toRounded(c.composicaoTotal),
+          };
+        });
+    }
   }
 
   @UseInterceptors(ClassSerializerInterceptor)

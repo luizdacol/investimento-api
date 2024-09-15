@@ -3,3 +3,8 @@ export class ComposicaoChartDto {
   labels: string[];
   data: number[];
 }
+
+export class ComposicaoV2ChartDto {
+  name: string;
+  value: number;
+}
