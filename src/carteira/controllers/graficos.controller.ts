@@ -67,19 +67,20 @@ export class GraficosController {
   @UseInterceptors(ClassSerializerInterceptor)
   @Get('composicao/:categoria')
   async getComposicao(
-    @Param('categoria') categoria: string,
+    @Param('categoria') categoria: TipoAtivo & 'Carteira',
   ): Promise<ComposicaoV2ChartDto[]> {
     const carteira = await this.carteiraService.calculateCarteira();
 
-    if (categoria !== 'carteira') {
+    if (categoria !== 'Carteira') {
       return carteira
         .filter((c) => c.tipoAtivo === categoria && c.nome !== 'Total')
         .map((c) => {
           return {
-            name: c.nome,
+            name: c.nome.replace('Tesouro ', ''),
             value: toRounded(c.composicao),
           };
-        });
+        })
+        .sort((a, b) => b.value - a.value);
     } else {
       return carteira
         .filter((c) => c.nome === 'Total' && c.composicaoTotal !== 0)
@@ -88,7 +89,8 @@ export class GraficosController {
             name: c.tipoAtivo,
             value: toRounded(c.composicaoTotal),
           };
-        });
+        })
+        .sort((a, b) => b.value - a.value);
     }
   }
 
