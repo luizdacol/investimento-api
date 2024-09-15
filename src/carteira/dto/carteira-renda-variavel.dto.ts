@@ -18,6 +18,10 @@ export class CarteiraRendaVariavelDto {
   dividendosRecebidosPorUnidade: number = 0;
   dataHoraCotacao: Date;
 
+  get nome(): string {
+    return this.ticker;
+  }
+
   @Expose()
   get precoMedioTotal(): number {
     return this.precoMedio * this.quantidade;
