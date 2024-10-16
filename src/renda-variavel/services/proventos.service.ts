@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateProventoDto } from '../dto/create-provento.dto';
 import { UpdateProventoDto } from '../dto/update-provento.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { FindOptionsOrder, FindOptionsWhere, Repository } from 'typeorm';
 import { Provento } from '../entities/provento.entity';
 import { Ativo } from '../entities/ativo.entity';
 import { TipoProvento } from 'src/enums/tipo-provento';
@@ -61,10 +61,14 @@ export class ProventosService {
     return proventoSaved;
   }
 
-  async findAll(): Promise<Provento[]> {
+  async findAll(
+    filters: FindOptionsWhere<Provento> = {},
+    orderby: FindOptionsOrder<Provento> = null,
+  ): Promise<Provento[]> {
     const proventos = await this.proventosRepository.find({
+      where: filters,
       relations: { ativo: true },
-      order: { dataPagamento: 'DESC' },
+      order: orderby || { dataPagamento: 'DESC' },
     });
     return proventos;
   }
@@ -161,5 +165,60 @@ export class ProventosService {
         proventosProvisionados: 0,
       },
     );
+  }
+
+  calcularResumoProventosPorMes(
+    proventos: Provento[],
+    operacoes: Operacao[],
+    ticker: string,
+  ): {
+    data: Date;
+    ativoId: number;
+    total: number;
+  }[] {
+    const fatorDesdobramentoPorData =
+      this.operacoesService.calcularFatorDesdobramentoPorData(
+        proventos
+          .filter((o) => o.ativo.ticker === ticker)
+          .map((o) => o.dataCom),
+        operacoes,
+        ticker,
+      );
+
+    const proventosDoAtivo = proventos.filter((p) => p.ativo.ticker === ticker);
+    const proventoResumido: {
+      data: Date;
+      ativoId: number;
+      total: number;
+    }[] = [];
+
+    for (const provento of proventosDoAtivo) {
+      const proventoMes = proventoResumido.find(
+        (c) =>
+          c.data.getUTCMonth() === provento.dataPagamento.getUTCMonth() &&
+          c.data.getUTCFullYear() === provento.dataPagamento.getUTCFullYear() &&
+          c.ativoId === provento.ativo.id,
+      );
+
+      if (!proventoMes) {
+        proventoResumido.push({
+          ativoId: provento.ativo.id,
+          data: new Date(
+            provento.dataPagamento.getUTCFullYear(),
+            provento.dataPagamento.getUTCMonth() + 1,
+            0,
+          ),
+          total:
+            provento.valorLiquido /
+            fatorDesdobramentoPorData.get(provento.dataCom.toISOString()),
+        });
+      } else {
+        proventoMes.total +=
+          provento.valorLiquido /
+          fatorDesdobramentoPorData.get(provento.dataCom.toISOString());
+      }
+    }
+
+    return proventoResumido;
   }
 }

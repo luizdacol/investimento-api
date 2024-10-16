@@ -16,13 +16,18 @@ import {
 import { ProventosService } from '../../renda-variavel/services/proventos.service';
 import { ProventosChartDto } from '../dto/proventos-chart.dto';
 import { Provento } from '../../renda-variavel/entities/provento.entity';
-import { toRounded } from '../../utils/helper';
+import { toPercentRounded, toRounded } from '../../utils/helper';
+import { YieldMonthlyChartDto } from '../dto/yield-monthly-chart.dto';
+import { OperacoesService } from 'src/renda-variavel/services/operacoes.service';
+import { AtivosService } from 'src/renda-variavel/services/ativos.service';
 
 @Controller('v1/graficos')
 export class GraficosController {
   constructor(
     private readonly carteiraService: CarteiraService,
     private readonly proventosService: ProventosService,
+    private readonly operacoesService: OperacoesService,
+    private readonly ativosService: AtivosService,
   ) {}
 
   @UseInterceptors(ClassSerializerInterceptor)
@@ -138,5 +143,82 @@ export class GraficosController {
     );
 
     return proventosDto;
+  }
+
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get('proventos/yield')
+  async getYieldMonthly(): Promise<YieldMonthlyChartDto[]> {
+    const [proventos, operacoes, ativos] = await Promise.all([
+      this.proventosService.findAll(
+        // { ativo: { ticker: In(['BRCO11', 'KNCR11']) } },
+        {},
+        { dataPagamento: 'ASC' },
+      ),
+      this.operacoesService.findAll(),
+      this.ativosService.findAll(),
+    ]);
+
+    const dadosPorMes: YieldMonthlyChartDto[] =
+      this.inicializarArrayYieldMensal();
+
+    for (const ativo of ativos) {
+      const proventosPorAtivoMes =
+        this.proventosService.calcularResumoProventosPorMes(
+          proventos,
+          operacoes,
+          ativo.ticker,
+        );
+
+      if (proventosPorAtivoMes.length === 0) continue;
+
+      dadosPorMes.forEach((item) => {
+        const proventoMes = proventosPorAtivoMes.find(
+          (p) =>
+            item.data ===
+            p.data.toLocaleString('pt-BR', {
+              month: 'numeric',
+              year: 'numeric',
+              timeZone: 'UTC',
+            }),
+        );
+        if (!proventoMes) {
+          item[ativo.ticker] = 0;
+        } else {
+          const { precoMedio } = this.operacoesService.calcularResumoOperacoes(
+            operacoes,
+            ativo.ticker,
+            proventoMes.data,
+          );
+
+          const yieldOnCost =
+            precoMedio !== 0
+              ? toPercentRounded(proventoMes.total / precoMedio)
+              : 0;
+
+          item[ativo.ticker] = yieldOnCost;
+        }
+      });
+    }
+
+    return dadosPorMes;
+  }
+
+  private inicializarArrayYieldMensal(): YieldMonthlyChartDto[] {
+    const yieldMensal: YieldMonthlyChartDto[] = [];
+
+    const dataInicial = new Date('2021-08-01T00:00:00.000Z');
+    const dataFinal = new Date();
+    while (dataInicial < dataFinal) {
+      yieldMensal.push({
+        data: dataInicial.toLocaleString('pt-BR', {
+          month: 'numeric',
+          year: 'numeric',
+          timeZone: 'UTC',
+        }),
+      });
+      dataInicial.setMonth(dataInicial.getMonth() + 1);
+    }
+
+    return yieldMensal;
   }
 }
