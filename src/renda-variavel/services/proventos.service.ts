@@ -9,6 +9,7 @@ import { TipoProvento } from 'src/enums/tipo-provento';
 import { OperacoesService } from './operacoes.service';
 import { AtivosService } from './ativos.service';
 import { Operacao } from '../entities/operacao.entity';
+import { TipoPeriodo } from 'src/enums/tipo-periodo.enum';
 
 @Injectable()
 export class ProventosService {
@@ -167,10 +168,11 @@ export class ProventosService {
     );
   }
 
-  calcularResumoProventosPorMes(
+  calcularResumoProventosAnualOuMensal(
     proventos: Provento[],
     operacoes: Operacao[],
     ticker: string,
+    periodo: TipoPeriodo,
   ): {
     data: Date;
     ativoId: number;
@@ -193,27 +195,33 @@ export class ProventosService {
     }[] = [];
 
     for (const provento of proventosDoAtivo) {
-      const proventoMes = proventoResumido.find(
+      const proventoAnualOuMensal = proventoResumido.find(
         (c) =>
-          c.data.getUTCMonth() === provento.dataPagamento.getUTCMonth() &&
+          (periodo === TipoPeriodo.ANUAL ||
+            c.data.getUTCMonth() === provento.dataPagamento.getUTCMonth()) &&
           c.data.getUTCFullYear() === provento.dataPagamento.getUTCFullYear() &&
           c.ativoId === provento.ativo.id,
       );
 
-      if (!proventoMes) {
+      if (!proventoAnualOuMensal) {
+        const ultimoDiaDoAnoOuMes =
+          periodo === TipoPeriodo.ANUAL
+            ? new Date(provento.dataPagamento.getUTCFullYear(), 11, 31)
+            : new Date(
+                provento.dataPagamento.getUTCFullYear(),
+                provento.dataPagamento.getUTCMonth() + 1,
+                0,
+              );
+
         proventoResumido.push({
           ativoId: provento.ativo.id,
-          data: new Date(
-            provento.dataPagamento.getUTCFullYear(),
-            provento.dataPagamento.getUTCMonth() + 1,
-            0,
-          ),
+          data: ultimoDiaDoAnoOuMes,
           total:
             provento.valorLiquido /
             fatorDesdobramentoPorData.get(provento.dataCom.toISOString()),
         });
       } else {
-        proventoMes.total +=
+        proventoAnualOuMensal.total +=
           provento.valorLiquido /
           fatorDesdobramentoPorData.get(provento.dataCom.toISOString());
       }

@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Query,
   UseInterceptors,
 } from '@nestjs/common';
 import { CarteiraService } from '../services/carteira.service';
@@ -20,6 +21,7 @@ import { toPercentRounded, toRounded } from '../../utils/helper';
 import { YieldMonthlyChartDto } from '../dto/yield-monthly-chart.dto';
 import { OperacoesService } from 'src/renda-variavel/services/operacoes.service';
 import { AtivosService } from 'src/renda-variavel/services/ativos.service';
+import { TipoPeriodo } from 'src/enums/tipo-periodo.enum';
 
 @Controller('v1/graficos')
 export class GraficosController {
@@ -147,36 +149,42 @@ export class GraficosController {
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Get('proventos/yield')
-  async getYieldMonthly(): Promise<YieldMonthlyChartDto[]> {
+  async getYieldMonthly(
+    @Query('periodo', {
+      transform(value) {
+        return isNaN(value) ? TipoPeriodo.MENSAL : value;
+      },
+    })
+    periodo?: TipoPeriodo,
+  ): Promise<YieldMonthlyChartDto[]> {
     const [proventos, operacoes, ativos] = await Promise.all([
-      this.proventosService.findAll(
-        // { ativo: { ticker: In(['BRCO11', 'KNCR11']) } },
-        {},
-        { dataPagamento: 'ASC' },
-      ),
+      this.proventosService.findAll({}, { dataPagamento: 'ASC' }),
       this.operacoesService.findAll(),
       this.ativosService.findAll(),
     ]);
 
-    const dadosPorMes: YieldMonthlyChartDto[] =
-      this.inicializarArrayYieldMensal();
+    const dadosPorPeriodo: YieldMonthlyChartDto[] =
+      periodo === TipoPeriodo.ANUAL
+        ? this.inicializarArrayAnual()
+        : this.inicializarArrayMensal();
 
     for (const ativo of ativos) {
       const proventosPorAtivoMes =
-        this.proventosService.calcularResumoProventosPorMes(
+        this.proventosService.calcularResumoProventosAnualOuMensal(
           proventos,
           operacoes,
           ativo.ticker,
+          periodo,
         );
 
       if (proventosPorAtivoMes.length === 0) continue;
 
-      dadosPorMes.forEach((item) => {
+      dadosPorPeriodo.forEach((item) => {
         const proventoMes = proventosPorAtivoMes.find(
           (p) =>
             item.data ===
             p.data.toLocaleString('pt-BR', {
-              month: 'numeric',
+              month: periodo === TipoPeriodo.ANUAL ? undefined : 'numeric',
               year: 'numeric',
               timeZone: 'UTC',
             }),
@@ -200,10 +208,10 @@ export class GraficosController {
       });
     }
 
-    return dadosPorMes;
+    return dadosPorPeriodo;
   }
 
-  private inicializarArrayYieldMensal(): YieldMonthlyChartDto[] {
+  private inicializarArrayMensal(): YieldMonthlyChartDto[] {
     const yieldMensal: YieldMonthlyChartDto[] = [];
 
     const dataInicial = new Date('2021-08-01T00:00:00.000Z');
@@ -216,7 +224,27 @@ export class GraficosController {
           timeZone: 'UTC',
         }),
       });
+
       dataInicial.setMonth(dataInicial.getMonth() + 1);
+    }
+
+    return yieldMensal;
+  }
+
+  private inicializarArrayAnual(): YieldMonthlyChartDto[] {
+    const yieldMensal: YieldMonthlyChartDto[] = [];
+
+    const dataInicial = new Date('2021-01-01T00:00:00.000Z');
+    const dataFinal = new Date();
+    while (dataInicial < dataFinal) {
+      yieldMensal.push({
+        data: dataInicial.toLocaleString('pt-BR', {
+          year: 'numeric',
+          timeZone: 'UTC',
+        }),
+      });
+
+      dataInicial.setFullYear(dataInicial.getFullYear() + 1);
     }
 
     return yieldMensal;
