@@ -1,7 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Operacao } from './operacao.entity';
-import { TipoAtivo } from 'src/enums/tipo-ativo.enum';
-import { ColumnNumericTransformer } from 'src/transformers/ColumnNumericTransformer';
+import { TipoAtivo } from '../../enums/tipo-ativo.enum';
+import { ColumnNumericTransformer } from '../../transformers/ColumnNumericTransformer';
 
 @Entity('ativos')
 export class Ativo {

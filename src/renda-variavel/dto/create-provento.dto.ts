@@ -6,7 +6,7 @@ import {
   IsNumber,
   IsDate,
 } from 'class-validator';
-import { TipoProvento } from 'src/enums/tipo-provento';
+import { TipoProvento } from '../../enums/tipo-provento';
 
 export class CreateProventoDto {
   @IsDate()

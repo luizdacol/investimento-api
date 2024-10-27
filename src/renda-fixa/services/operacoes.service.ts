@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsWhere, FindOptionsOrder } from 'typeorm';
 import { CreateOperacaoDto } from '../dto/create-operacao.dto';
 import { UpdateOperacaoDto } from '../dto/update-operacao.dto';
-import { TipoOperacao } from 'src/enums/tipo-operacao.enum';
+import { TipoOperacao } from '../../enums/tipo-operacao.enum';
 
 @Injectable()
 export class OperacoesService {

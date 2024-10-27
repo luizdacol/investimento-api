@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { TipoAtivo } from 'src/enums/tipo-ativo.enum';
-import { ColumnNumericTransformer } from 'src/transformers/ColumnNumericTransformer';
+import { TipoAtivo } from '../../enums/tipo-ativo.enum';
+import { ColumnNumericTransformer } from '../../transformers/ColumnNumericTransformer';
 
 @Entity('ativos_renda_fixa')
 export class Ativo {

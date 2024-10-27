@@ -1,5 +1,5 @@
 import { Expose } from 'class-transformer';
-import { toPercentRounded } from 'src/utils/helper';
+import { toPercentRounded } from '../../utils/helper';
 
 export class CarteiraRendaVariavelDto {
   constructor(ticker: string) {

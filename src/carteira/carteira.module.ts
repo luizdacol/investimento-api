@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { CarteiraService } from './services/carteira.service';
 import { CarteiraController } from './controllers/carteira.controller';
-import { RendaVariavelModule } from 'src/renda-variavel/renda-variavel.module';
-import { RendaFixaModule } from 'src/renda-fixa/renda-fixa.module';
+import { RendaFixaModule } from '../renda-fixa/renda-fixa.module';
 import { GraficosController } from './controllers/graficos.controller';
+import { RendaVariavelModule } from '../renda-variavel/renda-variavel.module';
 
 @Module({
   imports: [RendaVariavelModule, RendaFixaModule],

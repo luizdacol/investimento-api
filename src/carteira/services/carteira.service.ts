@@ -1,18 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { OperacoesService as OperacoesRendaVariavelService } from 'src/renda-variavel/services/operacoes.service';
+import { OperacoesService as OperacoesRendaVariavelService } from '../../renda-variavel/services/operacoes.service';
 import { CarteiraRendaVariavelDto } from '../dto/carteira-renda-variavel.dto';
-import { AtivosService as AtivosRendaVariavelService } from 'src/renda-variavel/services/ativos.service';
-import { ProventosService as ProventosRendaVariavelService } from 'src/renda-variavel/services/proventos.service';
-import { OperacoesService as OperacoesRendaFixaService } from 'src/renda-fixa/services/operacoes.service';
-import { AtivosService as AtivosRendaFixaService } from 'src/renda-fixa/services/ativos.service';
+import { AtivosService as AtivosRendaVariavelService } from '../../renda-variavel/services/ativos.service';
+import { ProventosService as ProventosRendaVariavelService } from '../../renda-variavel/services/proventos.service';
+import { OperacoesService as OperacoesRendaFixaService } from '../../renda-fixa/services/operacoes.service';
+import { AtivosService as AtivosRendaFixaService } from '../../renda-fixa/services/ativos.service';
 import { CarteiraRendaFixaDto } from '../dto/carteira-renda-fixa.dto';
-import { Ativo as AtivoRendaVariavel } from 'src/renda-variavel/entities/ativo.entity';
-import { Ativo as AtivoRendaFixa } from 'src/renda-fixa/entities/ativo.entity';
-import { Provento } from 'src/renda-variavel/entities/provento.entity';
-import { Operacao as OperacaoRendaVariavel } from 'src/renda-variavel/entities/operacao.entity';
-import { Operacao as OperacaoRendaFixa } from 'src/renda-fixa/entities/operacao.entity';
-import { toPercentRounded } from 'src/utils/helper';
-import { TipoAtivo } from 'src/enums/tipo-ativo.enum';
+import { Ativo as AtivoRendaVariavel } from '../../renda-variavel/entities/ativo.entity';
+import { Ativo as AtivoRendaFixa } from '../../renda-fixa/entities/ativo.entity';
+import { Provento } from '../../renda-variavel/entities/provento.entity';
+import { Operacao as OperacaoRendaVariavel } from '../../renda-variavel/entities/operacao.entity';
+import { Operacao as OperacaoRendaFixa } from '../../renda-fixa/entities/operacao.entity';
+import { toPercentRounded } from '../../utils/helper';
+import { TipoAtivo } from '../../enums/tipo-ativo.enum';
 
 @Injectable()
 export class CarteiraService {

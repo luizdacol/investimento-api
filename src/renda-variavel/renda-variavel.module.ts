@@ -8,7 +8,7 @@ import { ProventosController } from './controllers/proventos.controller';
 import { ProventosService } from './services/proventos.service';
 import { Provento } from './entities/provento.entity';
 import { AtivosService } from './services/ativos.service';
-import { CotacaoModule } from 'src/cotacao/cotacao.module';
+import { CotacaoModule } from '../cotacao/cotacao.module';
 import { AtivosController } from './controllers/ativos.controller';
 import { GraficosController } from './controllers/graficos.controller';
 

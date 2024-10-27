@@ -6,9 +6,9 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Ativo } from './ativo.entity';
-import { TipoProvento } from 'src/enums/tipo-provento';
-import { ColumnNumericTransformer } from 'src/transformers/ColumnNumericTransformer';
-import { DateTransformer } from 'src/transformers/DateTransformer';
+import { TipoProvento } from '../../enums/tipo-provento';
+import { ColumnNumericTransformer } from '../../transformers/ColumnNumericTransformer';
+import { DateTransformer } from '../../transformers/DateTransformer';
 
 @Entity('proventos')
 export class Provento {

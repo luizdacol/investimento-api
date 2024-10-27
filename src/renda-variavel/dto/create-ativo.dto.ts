@@ -7,7 +7,7 @@ import {
   IsDate,
   IsOptional,
 } from 'class-validator';
-import { TipoAtivo } from 'src/enums/tipo-ativo.enum';
+import { TipoAtivo } from '../../enums/tipo-ativo.enum';
 
 export class CreateAtivoDto {
   @IsString()

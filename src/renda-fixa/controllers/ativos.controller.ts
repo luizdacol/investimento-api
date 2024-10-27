@@ -10,7 +10,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { AtivosService } from '../services/ativos.service';
-import { CotacaoService } from 'src/cotacao/cotacao.service';
+import { CotacaoService } from '../../cotacao/cotacao.service';
 import { CreateAtivoDto } from '../dto/create-ativo.dto';
 import { UpdateAtivoDto } from '../dto/update-ativo.dto';
 import { Ativo } from '../entities/ativo.entity';

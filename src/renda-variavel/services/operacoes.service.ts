@@ -4,7 +4,7 @@ import { UpdateOperacaoDto } from '../dto/update-operacao.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsOrder, FindOptionsWhere, Repository } from 'typeorm';
 import { Operacao } from '../entities/operacao.entity';
-import { TipoOperacao } from 'src/enums/tipo-operacao.enum';
+import { TipoOperacao } from '../../enums/tipo-operacao.enum';
 import { AtivosService } from './ativos.service';
 import { TaxasNegociacaoDto } from '../dto/taxas-negociacao.dto';
 

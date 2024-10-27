@@ -7,7 +7,7 @@ import {
   IsString,
   IsDate,
 } from 'class-validator';
-import { TipoOperacao } from 'src/enums/tipo-operacao.enum';
+import { TipoOperacao } from '../../enums/tipo-operacao.enum';
 
 export class CreateOperacaoDto {
   @IsDate()

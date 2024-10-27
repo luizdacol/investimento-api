@@ -19,9 +19,9 @@ import { ProventosChartDto } from '../dto/proventos-chart.dto';
 import { Provento } from '../../renda-variavel/entities/provento.entity';
 import { toPercentRounded, toRounded } from '../../utils/helper';
 import { YieldMonthlyChartDto } from '../dto/yield-monthly-chart.dto';
-import { OperacoesService } from 'src/renda-variavel/services/operacoes.service';
-import { AtivosService } from 'src/renda-variavel/services/ativos.service';
-import { TipoPeriodo } from 'src/enums/tipo-periodo.enum';
+import { OperacoesService } from '../../renda-variavel/services/operacoes.service';
+import { AtivosService } from '../../renda-variavel/services/ativos.service';
+import { TipoPeriodo } from '../../enums/tipo-periodo.enum';
 
 @Controller('v1/graficos')
 export class GraficosController {

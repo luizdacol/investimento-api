@@ -5,11 +5,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsOrder, FindOptionsWhere, Repository } from 'typeorm';
 import { Provento } from '../entities/provento.entity';
 import { Ativo } from '../entities/ativo.entity';
-import { TipoProvento } from 'src/enums/tipo-provento';
+import { TipoProvento } from '../../enums/tipo-provento';
 import { OperacoesService } from './operacoes.service';
 import { AtivosService } from './ativos.service';
 import { Operacao } from '../entities/operacao.entity';
-import { TipoPeriodo } from 'src/enums/tipo-periodo.enum';
+import { TipoPeriodo } from '../../enums/tipo-periodo.enum';
 
 @Injectable()
 export class ProventosService {
