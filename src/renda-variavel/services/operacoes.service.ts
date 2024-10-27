@@ -108,6 +108,9 @@ export class OperacoesService {
     );
   }
 
+  /**
+   * @deprecated This method is deprecated in favor of the calcularFatorDesdobramentoPorData method of calculo.ts file.
+   */
   public calcularFatorDesdobramentoPorData(
     datasBase: Date[],
     operacoes: Operacao[],
