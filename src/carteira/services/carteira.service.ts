@@ -156,8 +156,6 @@ export class CarteiraService {
 
     ativoNaCarteira.precoMercado = ativo.cotacao || 0;
     ativoNaCarteira.dataHoraCotacao = ativo.dataHoraCotacao;
-    ativoNaCarteira.dividendosProvisionados =
-      resumoProventos.proventosProvisionados;
     ativoNaCarteira.dividendosRecebidos = resumoProventos.proventosRecebidos;
     ativoNaCarteira.dividendosRecebidosPorUnidade =
       resumoProventos.proventosPorAcao;

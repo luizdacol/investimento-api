@@ -10,6 +10,7 @@ import { OperacoesService } from './operacoes.service';
 import { AtivosService } from './ativos.service';
 import { Operacao } from '../entities/operacao.entity';
 import { TipoPeriodo } from '../../enums/tipo-periodo.enum';
+import { calcularFatorDesdobramentoPorData } from '../../utils/calculos';
 
 @Injectable()
 export class ProventosService {
@@ -135,24 +136,17 @@ export class ProventosService {
   ): {
     proventosPorAcao: number;
     proventosRecebidos: number;
-    proventosProvisionados: number;
   } {
-    const fatorDesdobramentoPorData =
-      this.operacoesService.calcularFatorDesdobramentoPorData(
-        proventos
-          .filter((o) => o.ativo.ticker === ticker)
-          .map((o) => o.dataCom),
-        operacoes,
-        ticker,
-      );
+    const fatorDesdobramentoPorData = calcularFatorDesdobramentoPorData(
+      proventos.filter((o) => o.ativo.ticker === ticker).map((o) => o.dataCom),
+      operacoes.filter((o) => o.ativo.ticker === ticker),
+    );
 
     const proventosDoAtivo = proventos.filter((p) => p.ativo.ticker === ticker);
 
     return proventosDoAtivo.reduce(
       (proventoResumido, proventoAtual) => {
-        if (proventoAtual.dataPagamento > dataBase) {
-          proventoResumido.proventosProvisionados += proventoAtual.valorTotal;
-        } else {
+        if (proventoAtual.dataPagamento <= dataBase) {
           proventoResumido.proventosRecebidos += proventoAtual.valorTotal;
           proventoResumido.proventosPorAcao +=
             proventoAtual.valorLiquido /
@@ -163,7 +157,6 @@ export class ProventosService {
       {
         proventosPorAcao: 0,
         proventosRecebidos: 0,
-        proventosProvisionados: 0,
       },
     );
   }
