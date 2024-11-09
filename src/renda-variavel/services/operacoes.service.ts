@@ -170,6 +170,8 @@ export class OperacoesService {
             operacaoResumida.precoTotal / operacaoResumida.posicao;
         } else if (operacaoAtual.tipo === TipoOperacao.VENDA) {
           operacaoResumida.posicao -= operacaoAtual.quantidade;
+          operacaoResumida.precoTotal =
+            operacaoResumida.posicao * operacaoResumida.precoMedio;
         }
 
         return operacaoResumida;

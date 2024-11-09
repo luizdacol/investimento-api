@@ -19,7 +19,7 @@
     "pg:restore": "docker exec -i db-investimento /bin/bash -c \"PGPASSWORD=password psql --username postgres postgres\" < ./data-dump.sql",
     "app:deploy": "docker compose build",
     "app:start": "docker compose up -d app-investimento && docker compose logs -f api-investimento",
-    "test": "jest",
+    "test": "jest --verbose",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
