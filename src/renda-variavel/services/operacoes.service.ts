@@ -7,6 +7,7 @@ import { Operacao } from '../entities/operacao.entity';
 import { TipoOperacao } from '../../enums/tipo-operacao.enum';
 import { AtivosService } from './ativos.service';
 import { TaxasNegociacaoDto } from '../dto/taxas-negociacao.dto';
+import { calcularFatorDesdobramentoPorData } from '../../utils/calculos';
 
 @Injectable()
 export class OperacoesService {
@@ -141,10 +142,9 @@ export class OperacoesService {
     precoTotal: number;
     posicao: number;
   } {
-    const fatorDesdobramentoPorData = this.calcularFatorDesdobramentoPorData(
+    const fatorDesdobramentoPorData = calcularFatorDesdobramentoPorData(
       operacoes.filter((o) => o.ativo.ticker === ticker).map((o) => o.data),
-      operacoes,
-      ticker,
+      operacoes.filter((o) => o.ativo.ticker === ticker),
     );
 
     const operacoesDoAtivo = operacoes.filter((o) =>
