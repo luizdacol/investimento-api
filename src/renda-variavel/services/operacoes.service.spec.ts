@@ -226,5 +226,43 @@ describe('OperacoesService (Renda Variavel)', () => {
         expect(resumoOperacao.precoMedio).toBe(10);
       });
     });
+
+    describe('quando for informada uma data base', () => {
+      const operacoes: Operacao[] = [
+        {
+          ativo,
+          data: new Date('2021-01-01'),
+          id: 1,
+          precoUnitario: 10,
+          quantidade: 100,
+          precoTotal: 1000,
+          tipo: TipoOperacao.COMPRA,
+        },
+        {
+          ativo,
+          data: new Date('2021-02-01'),
+          id: 1,
+          precoUnitario: 12,
+          quantidade: 100,
+          precoTotal: 1200,
+          tipo: TipoOperacao.COMPRA,
+        },
+      ];
+      const resumoOperacao = operacoesService.calcularResumoOperacoes(
+        operacoes,
+        ativo.ticker,
+        new Date('2021-01-10'),
+      );
+
+      it('posicao deve considerar tudo antes da data base informada', () => {
+        expect(resumoOperacao.posicao).toBe(100);
+      });
+      it('preco total deve considerar tudo antes da data base informada', () => {
+        expect(resumoOperacao.precoTotal).toBe(1000);
+      });
+      it('preco medio deve considerar tudo antes da data base informada', () => {
+        expect(resumoOperacao.precoMedio).toBe(10);
+      });
+    });
   });
 });
