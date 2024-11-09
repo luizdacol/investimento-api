@@ -171,14 +171,10 @@ export class ProventosService {
     ativoId: number;
     total: number;
   }[] {
-    const fatorDesdobramentoPorData =
-      this.operacoesService.calcularFatorDesdobramentoPorData(
-        proventos
-          .filter((o) => o.ativo.ticker === ticker)
-          .map((o) => o.dataCom),
-        operacoes,
-        ticker,
-      );
+    const fatorDesdobramentoPorData = calcularFatorDesdobramentoPorData(
+      proventos.filter((o) => o.ativo.ticker === ticker).map((o) => o.dataCom),
+      operacoes.filter((o) => o.ativo.ticker === ticker),
+    );
 
     const proventosDoAtivo = proventos.filter((p) => p.ativo.ticker === ticker);
     const proventoResumido: {

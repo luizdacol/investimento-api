@@ -109,30 +109,6 @@ export class OperacoesService {
     );
   }
 
-  /**
-   * @deprecated This method is deprecated in favor of the calcularFatorDesdobramentoPorData method of calculo.ts file.
-   */
-  public calcularFatorDesdobramentoPorData(
-    datasBase: Date[],
-    operacoes: Operacao[],
-    ticker: string,
-  ): Map<string, number> {
-    const operacoesDoAtivo = operacoes.filter((o) => o.ativo.ticker === ticker);
-    const desdobramentosDoAtivo = operacoesDoAtivo.filter(
-      (a) => a.tipo === TipoOperacao.DESDOBRAMENTO,
-    );
-
-    return new Map(
-      datasBase.map((dataBase) => {
-        const fatorDesdobramento = desdobramentosDoAtivo
-          .filter((d) => d.data >= dataBase)
-          .reduce<number>((fator, op) => fator * op.quantidade, 1);
-
-        return [dataBase.toISOString(), fatorDesdobramento];
-      }),
-    );
-  }
-
   public calcularResumoOperacoes(
     operacoes: Operacao[],
     ticker: string,
