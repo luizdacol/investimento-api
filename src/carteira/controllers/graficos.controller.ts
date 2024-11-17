@@ -170,10 +170,10 @@ export class GraficosController {
 
     for (const ativo of ativos) {
       const proventosPorAtivoMes =
-        this.proventosService.calcularResumoProventosAnualOuMensal(
-          proventos,
-          operacoes,
-          ativo.ticker,
+        this.proventosService.calcularResumoProventos(
+          proventos.filter((p) => p.ativo.id === ativo.id),
+          operacoes.filter((o) => o.ativo.id === ativo.id),
+          new Date(),
           periodo,
         );
 
@@ -200,7 +200,7 @@ export class GraficosController {
 
           const yieldOnCost =
             precoMedio !== 0
-              ? toPercentRounded(proventoMes.total / precoMedio)
+              ? toPercentRounded(proventoMes.valorUnitario / precoMedio)
               : 0;
 
           item[ativo.ticker] = yieldOnCost;
