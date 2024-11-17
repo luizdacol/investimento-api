@@ -169,7 +169,7 @@ export class ProventosService {
     return datas;
   }
 
-  calcularResumoProventosAux(
+  calcularResumoProventos(
     proventos: Provento[],
     operacoes: Operacao[],
     dataBase: Date,
@@ -216,39 +216,6 @@ export class ProventosService {
     }
 
     return proventoResumido;
-  }
-
-  calcularResumoProventos(
-    proventos: Provento[],
-    operacoes: Operacao[],
-    ticker: string,
-    dataBase: Date = new Date(),
-  ): {
-    proventosPorAcao: number;
-    proventosRecebidos: number;
-  } {
-    const fatorDesdobramentoPorData = calcularFatorDesdobramentoPorData(
-      proventos.filter((o) => o.ativo.ticker === ticker).map((o) => o.dataCom),
-      operacoes.filter((o) => o.ativo.ticker === ticker),
-    );
-
-    const proventosDoAtivo = proventos.filter((p) => p.ativo.ticker === ticker);
-
-    return proventosDoAtivo.reduce(
-      (proventoResumido, proventoAtual) => {
-        if (proventoAtual.dataPagamento <= dataBase) {
-          proventoResumido.proventosRecebidos += proventoAtual.valorTotal;
-          proventoResumido.proventosPorAcao +=
-            proventoAtual.valorLiquido /
-            fatorDesdobramentoPorData.get(proventoAtual.dataCom.toISOString());
-        }
-        return proventoResumido;
-      },
-      {
-        proventosPorAcao: 0,
-        proventosRecebidos: 0,
-      },
-    );
   }
 
   calcularResumoProventosAnualOuMensal(

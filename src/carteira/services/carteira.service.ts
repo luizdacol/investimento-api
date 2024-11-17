@@ -13,6 +13,7 @@ import { Operacao as OperacaoRendaVariavel } from '../../renda-variavel/entities
 import { Operacao as OperacaoRendaFixa } from '../../renda-fixa/entities/operacao.entity';
 import { toPercentRounded } from '../../utils/helper';
 import { TipoAtivo } from '../../enums/tipo-ativo.enum';
+import { TipoPeriodo } from '../../enums/tipo-periodo.enum';
 
 @Injectable()
 export class CarteiraService {
@@ -148,17 +149,18 @@ export class CarteiraService {
 
     const resumoProventos =
       this._proventosRendaVariavelService.calcularResumoProventos(
-        proventos,
-        operacoes,
-        ativo.ticker,
+        proventos.filter((p) => p.ativo.ticker === ativo.ticker),
+        operacoes.filter((o) => o.ativo.ticker === ativo.ticker),
         new Date(),
+        TipoPeriodo.TUDO,
       );
 
     ativoNaCarteira.precoMercado = ativo.cotacao || 0;
     ativoNaCarteira.dataHoraCotacao = ativo.dataHoraCotacao;
-    ativoNaCarteira.dividendosRecebidos = resumoProventos.proventosRecebidos;
+    ativoNaCarteira.dividendosRecebidos =
+      resumoProventos.at(0)?.valorTotal ?? 0;
     ativoNaCarteira.dividendosRecebidosPorUnidade =
-      resumoProventos.proventosPorAcao;
+      resumoProventos.at(0)?.valorUnitario ?? 0;
 
     return ativoNaCarteira;
   }
