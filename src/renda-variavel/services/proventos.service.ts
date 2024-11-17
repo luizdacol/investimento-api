@@ -128,6 +128,96 @@ export class ProventosService {
     return result.affected > 0;
   }
 
+  getUltimoDiaPorPeriodo(
+    dataPagamento: Date,
+    periodo: TipoPeriodo,
+    dataBase: Date,
+  ): Date {
+    if (periodo === TipoPeriodo.ANUAL) {
+      return new Date(dataPagamento.getUTCFullYear(), 11, 31);
+    } else if (periodo === TipoPeriodo.MENSAL) {
+      return new Date(
+        dataPagamento.getUTCFullYear(),
+        dataPagamento.getUTCMonth() + 1,
+        0,
+      );
+    } else {
+      return dataBase;
+    }
+  }
+
+  groupPorData(
+    proventos: Provento[],
+    dataBase: Date,
+    periodo: TipoPeriodo,
+  ): Date[] {
+    const datas: Date[] = [];
+    for (const provento of proventos) {
+      const ultimoDiaPeriodo = this.getUltimoDiaPorPeriodo(
+        provento.dataPagamento,
+        periodo,
+        dataBase,
+      );
+
+      const item = datas.find(
+        (data) => data.getTime() === ultimoDiaPeriodo.getTime(),
+      );
+      if (!item) {
+        datas.push(ultimoDiaPeriodo);
+      }
+    }
+    return datas;
+  }
+
+  calcularResumoProventosAux(
+    proventos: Provento[],
+    operacoes: Operacao[],
+    dataBase: Date,
+    periodo: TipoPeriodo,
+  ): {
+    data: Date;
+    ativoId: number;
+    valorUnitario: number;
+    valorTotal: number;
+  }[] {
+    const proventosAteDataBase = proventos.filter(
+      (p) => p.dataPagamento <= dataBase,
+    );
+
+    const fatorDesdobramentoPorData = calcularFatorDesdobramentoPorData(
+      proventosAteDataBase.map((o) => o.dataCom),
+      operacoes.filter((o) => o.data <= dataBase),
+    );
+
+    const proventoResumido = this.groupPorData(
+      proventosAteDataBase,
+      dataBase,
+      periodo,
+    ).map((data) => {
+      return {
+        data: data,
+        ativoId: proventos[0].ativo.id,
+        valorTotal: 0,
+        valorUnitario: 0,
+      };
+    });
+
+    for (const provento of proventosAteDataBase) {
+      const item = proventoResumido.find(
+        (p) => provento.dataPagamento <= p.data,
+      );
+
+      if (item) {
+        item.valorTotal += provento.valorTotal;
+        item.valorUnitario +=
+          provento.valorLiquido /
+          fatorDesdobramentoPorData.get(provento.dataCom.toISOString());
+      }
+    }
+
+    return proventoResumido;
+  }
+
   calcularResumoProventos(
     proventos: Provento[],
     operacoes: Operacao[],
