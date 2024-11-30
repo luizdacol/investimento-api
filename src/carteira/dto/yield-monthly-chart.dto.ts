@@ -1,4 +1,5 @@
 export class YieldMonthlyChartDto {
   data: string;
-  [ticker: string]: string | number;
+  chaveData: Date;
+  [ticker: string]: string | number | Date;
 }

@@ -17,7 +17,11 @@ import {
 import { ProventosService } from '../../renda-variavel/services/proventos.service';
 import { ProventosChartDto } from '../dto/proventos-chart.dto';
 import { Provento } from '../../renda-variavel/entities/provento.entity';
-import { toPercentRounded, toRounded } from '../../utils/helper';
+import {
+  getUltimoDiaPorPeriodo,
+  toPercentRounded,
+  toRounded,
+} from '../../utils/helper';
 import { YieldMonthlyChartDto } from '../dto/yield-monthly-chart.dto';
 import { OperacoesService } from '../../renda-variavel/services/operacoes.service';
 import { AtivosService } from '../../renda-variavel/services/ativos.service';
@@ -181,13 +185,7 @@ export class GraficosController {
 
       dadosPorPeriodo.forEach((item) => {
         const proventoMes = proventosPorAtivoMes.find(
-          (p) =>
-            item.data ===
-            p.data.toLocaleString('pt-BR', {
-              month: periodo === TipoPeriodo.ANUAL ? undefined : 'numeric',
-              year: 'numeric',
-              timeZone: 'UTC',
-            }),
+          (p) => item.chaveData.getTime() === p.data.getTime(),
         );
         if (!proventoMes) {
           item[ativo.ticker] = 0;
@@ -218,6 +216,7 @@ export class GraficosController {
     const dataFinal = new Date();
     while (dataInicial < dataFinal) {
       yieldMensal.push({
+        chaveData: getUltimoDiaPorPeriodo(dataInicial, TipoPeriodo.MENSAL),
         data: dataInicial.toLocaleString('pt-BR', {
           month: 'numeric',
           year: 'numeric',
@@ -238,6 +237,7 @@ export class GraficosController {
     const dataFinal = new Date();
     while (dataInicial < dataFinal) {
       yieldMensal.push({
+        chaveData: getUltimoDiaPorPeriodo(dataInicial, TipoPeriodo.ANUAL),
         data: dataInicial.toLocaleString('pt-BR', {
           year: 'numeric',
           timeZone: 'UTC',
