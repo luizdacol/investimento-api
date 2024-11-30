@@ -11,6 +11,8 @@ import { AtivosService } from './ativos.service';
 import { Operacao } from '../entities/operacao.entity';
 import { TipoPeriodo } from '../../enums/tipo-periodo.enum';
 import { calcularFatorDesdobramentoPorData } from '../../utils/calculos';
+import { getUltimoDiaPorPeriodo } from '../../utils/helper';
+import { ResumoProventoPorDataDto } from '../dto/resumo-provento-por-data.dto';
 
 @Injectable()
 export class ProventosService {
@@ -128,24 +130,6 @@ export class ProventosService {
     return result.affected > 0;
   }
 
-  getUltimoDiaPorPeriodo(
-    dataPagamento: Date,
-    periodo: TipoPeriodo,
-    dataBase: Date,
-  ): Date {
-    if (periodo === TipoPeriodo.ANUAL) {
-      return new Date(dataPagamento.getUTCFullYear(), 11, 31);
-    } else if (periodo === TipoPeriodo.MENSAL) {
-      return new Date(
-        dataPagamento.getUTCFullYear(),
-        dataPagamento.getUTCMonth() + 1,
-        0,
-      );
-    } else {
-      return dataBase;
-    }
-  }
-
   groupPorData(
     proventos: Provento[],
     dataBase: Date,
@@ -153,11 +137,8 @@ export class ProventosService {
   ): Date[] {
     const datas: Date[] = [];
     for (const provento of proventos) {
-      const ultimoDiaPeriodo = this.getUltimoDiaPorPeriodo(
-        provento.dataPagamento,
-        periodo,
-        dataBase,
-      );
+      const ultimoDiaPeriodo =
+        getUltimoDiaPorPeriodo(provento.dataPagamento, periodo) || dataBase;
 
       const item = datas.find(
         (data) => data.getTime() === ultimoDiaPeriodo.getTime(),
@@ -174,12 +155,7 @@ export class ProventosService {
     operacoes: Operacao[],
     dataBase: Date,
     periodo: TipoPeriodo,
-  ): {
-    data: Date;
-    ativoId: number;
-    valorUnitario: number;
-    valorTotal: number;
-  }[] {
+  ): ResumoProventoPorDataDto[] {
     const proventosAteDataBase = proventos.filter(
       (p) => p.dataPagamento <= dataBase,
     );
@@ -199,7 +175,7 @@ export class ProventosService {
         ativoId: proventos[0].ativo.id,
         valorTotal: 0,
         valorUnitario: 0,
-      };
+      } as ResumoProventoPorDataDto;
     });
 
     for (const provento of proventosAteDataBase) {
