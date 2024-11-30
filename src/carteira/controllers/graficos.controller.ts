@@ -26,6 +26,7 @@ import { YieldMonthlyChartDto } from '../dto/yield-monthly-chart.dto';
 import { OperacoesService } from '../../renda-variavel/services/operacoes.service';
 import { AtivosService } from '../../renda-variavel/services/ativos.service';
 import { TipoPeriodo } from '../../enums/tipo-periodo.enum';
+import { ResumoProventoPorDataDto } from '../../renda-variavel/dto/resumo-provento-por-data.dto';
 
 @Controller('v1/graficos')
 export class GraficosController {
@@ -182,11 +183,16 @@ export class GraficosController {
         );
 
       if (proventosPorAtivoMes.length === 0) continue;
+      let index: number = 0;
 
       dadosPorPeriodo.forEach((item) => {
-        const proventoMes = proventosPorAtivoMes.find(
-          (p) => item.chaveData.getTime() === p.data.getTime(),
+        let proventoMes: ResumoProventoPorDataDto;
+        [proventoMes, index] = this.buscaOtimizadaProventos(
+          item.chaveData,
+          proventosPorAtivoMes,
+          index,
         );
+
         if (!proventoMes) {
           item[ativo.ticker] = 0;
         } else {
@@ -207,6 +213,22 @@ export class GraficosController {
     }
 
     return dadosPorPeriodo;
+  }
+
+  private buscaOtimizadaProventos(
+    dataBuscada: Date,
+    proventosPorAtivoMes: ResumoProventoPorDataDto[],
+    index: number = 0,
+  ): [ResumoProventoPorDataDto, number] {
+    for (index; index < proventosPorAtivoMes.length; index++) {
+      const item = proventosPorAtivoMes[index];
+      if (dataBuscada.getTime() === item.data.getTime()) {
+        return [item, index];
+      } else if (dataBuscada.getTime() < item.data.getTime()) {
+        return [undefined, index];
+      }
+    }
+    return [undefined, index];
   }
 
   private inicializarArrayMensal(): YieldMonthlyChartDto[] {
