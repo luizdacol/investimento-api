@@ -131,7 +131,8 @@ export class OperacoesService {
       (operacaoResumida, operacaoAtual) => {
         if (
           operacaoAtual.tipo === TipoOperacao.COMPRA ||
-          operacaoAtual.tipo === TipoOperacao.BONIFICACAO
+          operacaoAtual.tipo === TipoOperacao.BONIFICACAO ||
+          operacaoAtual.tipo === TipoOperacao.ATUALIZACAO
         ) {
           operacaoResumida.posicao +=
             operacaoAtual.quantidade *

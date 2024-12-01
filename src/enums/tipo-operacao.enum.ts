@@ -4,4 +4,5 @@ export enum TipoOperacao {
   DESDOBRAMENTO = 'Desdobramento',
   BONIFICACAO = 'Bonificação',
   AMORTIZACAO = 'Amortização',
+  ATUALIZACAO = 'Atualização',
 }
