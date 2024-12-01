@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { RootResultDto } from './dto/root-result.dto';
 import { QuoteInfoResponseDto } from './dto/quote-info-response.dto';
-import { catchError, firstValueFrom } from 'rxjs';
+import { catchError, firstValueFrom, of } from 'rxjs';
 import { AxiosError } from 'axios';
 import { ConfigService } from '@nestjs/config';
 import {
@@ -29,7 +29,7 @@ export class CotacaoService {
         .pipe(
           catchError((error: AxiosError) => {
             console.error(error.response.data);
-            throw 'An error happened!';
+            return of({ data: { results: [] } });
           }),
         ),
     );
