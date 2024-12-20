@@ -3,5 +3,6 @@ export class ProventosChartDto {
   fii: number;
   acao: number;
   bdr: number;
+  etf: number;
   carteira: number;
 }

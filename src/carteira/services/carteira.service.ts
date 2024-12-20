@@ -76,6 +76,7 @@ export class CarteiraService {
       [TipoAtivo.FII, new CarteiraRendaVariavelDto('Total')],
       [TipoAtivo.ACAO, new CarteiraRendaVariavelDto('Total')],
       [TipoAtivo.BDR, new CarteiraRendaVariavelDto('Total')],
+      [TipoAtivo.ETF, new CarteiraRendaVariavelDto('Total')],
       [TipoAtivo.CDB, new CarteiraRendaFixaDto('Total')],
       [TipoAtivo.TESOURO_DIRETO, new CarteiraRendaFixaDto('Total')],
     ]);

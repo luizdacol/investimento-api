@@ -120,6 +120,7 @@ export class GraficosController {
         fii: 0,
         acao: 0,
         bdr: 0,
+        etf: 0,
         carteira: 0,
       } as ProventosChartDto);
       startDate.setMonth(startDate.getMonth() + 1);
@@ -142,6 +143,8 @@ export class GraficosController {
           proventoMes.fii += item.valorTotal;
         } else if (item.ativo.tipo === TipoAtivo.BDR) {
           proventoMes.bdr += item.valorTotal;
+        } else if (item.ativo.tipo === TipoAtivo.ETF) {
+          proventoMes.etf += item.valorTotal;
         }
 
         return chartDto;
