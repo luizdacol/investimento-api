@@ -13,6 +13,7 @@ import { TipoPeriodo } from '../../enums/tipo-periodo.enum';
 import { calcularFatorDesdobramentoPorData } from '../../utils/calculos';
 import { getUltimoDiaPorPeriodo } from '../../utils/helper';
 import { ResumoProventoPorDataDto } from '../dto/resumo-provento-por-data.dto';
+import { TipoAtivo } from '../../enums/tipo-ativo.enum';
 
 @Injectable()
 export class ProventosService {
@@ -27,8 +28,13 @@ export class ProventosService {
     private _ativosService: AtivosService,
   ) {}
 
-  private calcularValorLiquido(valorBruto: number, tipo: TipoProvento): number {
-    if (tipo === TipoProvento.JCP) return valorBruto * (1 - 0.15);
+  private calcularValorLiquido(
+    valorBruto: number,
+    tipo: TipoProvento,
+    ativo: Ativo,
+  ): number {
+    if (tipo === TipoProvento.JCP || ativo.tipo === TipoAtivo.ETF)
+      return valorBruto * (1 - 0.15);
 
     return valorBruto;
   }
@@ -42,6 +48,7 @@ export class ProventosService {
     const valorLiquido = this.calcularValorLiquido(
       createProventoDto.valorBruto,
       createProventoDto.tipo,
+      ativo,
     );
 
     const operacoes = await this.operacoesService.findAll();
@@ -109,6 +116,7 @@ export class ProventosService {
     provento.valorLiquido = this.calcularValorLiquido(
       provento.valorBruto,
       provento.tipo,
+      provento.ativo,
     );
 
     const operacoes = await this.operacoesService.findAll();
