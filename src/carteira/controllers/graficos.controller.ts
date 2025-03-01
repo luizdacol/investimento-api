@@ -22,7 +22,7 @@ import {
   toPercentRounded,
   toRounded,
 } from '../../utils/helper';
-import { YieldMonthlyChartDto } from '../dto/yield-monthly-chart.dto';
+import { YieldMonthlyChartDto as ProventosEvolucaoChartDto } from '../dto/yield-monthly-chart.dto';
 import { OperacoesService } from '../../renda-variavel/services/operacoes.service';
 import { AtivosService } from '../../renda-variavel/services/ativos.service';
 import { TipoPeriodo } from '../../enums/tipo-periodo.enum';
@@ -158,7 +158,7 @@ export class GraficosController {
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Get('proventos/evolucao')
-  async getYieldMonthly(
+  async getProventosEvolucao(
     @Query('periodo', {
       transform(value) {
         return isNaN(value) ? TipoPeriodo.MENSAL : value;
@@ -171,14 +171,14 @@ export class GraficosController {
       },
     })
     informacao?: TipoInformacao,
-  ): Promise<YieldMonthlyChartDto[]> {
+  ): Promise<ProventosEvolucaoChartDto[]> {
     const [proventos, operacoes, ativos] = await Promise.all([
       this.proventosService.findAll({}, { dataPagamento: 'ASC' }),
       this.operacoesService.findAll(),
       this.ativosService.findAll(),
     ]);
 
-    const dadosPorPeriodo: YieldMonthlyChartDto[] =
+    const dadosPorPeriodo: ProventosEvolucaoChartDto[] =
       periodo === TipoPeriodo.ANUAL
         ? this.inicializarArrayAnual()
         : this.inicializarArrayMensal();
@@ -246,8 +246,8 @@ export class GraficosController {
     return [undefined, index];
   }
 
-  private inicializarArrayMensal(): YieldMonthlyChartDto[] {
-    const yieldMensal: YieldMonthlyChartDto[] = [];
+  private inicializarArrayMensal(): ProventosEvolucaoChartDto[] {
+    const yieldMensal: ProventosEvolucaoChartDto[] = [];
 
     const dataInicial = new Date('2021-08-01T00:00:00.000Z');
     const dataFinal = new Date();
@@ -267,8 +267,8 @@ export class GraficosController {
     return yieldMensal;
   }
 
-  private inicializarArrayAnual(): YieldMonthlyChartDto[] {
-    const yieldMensal: YieldMonthlyChartDto[] = [];
+  private inicializarArrayAnual(): ProventosEvolucaoChartDto[] {
+    const yieldMensal: ProventosEvolucaoChartDto[] = [];
 
     const dataInicial = new Date('2021-01-01T00:00:00.000Z');
     const dataFinal = new Date();
