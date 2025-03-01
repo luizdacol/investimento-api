@@ -27,6 +27,7 @@ import { OperacoesService } from '../../renda-variavel/services/operacoes.servic
 import { AtivosService } from '../../renda-variavel/services/ativos.service';
 import { TipoPeriodo } from '../../enums/tipo-periodo.enum';
 import { ResumoProventoPorDataDto } from '../../renda-variavel/dto/resumo-provento-por-data.dto';
+import { TipoInformacao } from '../../enums/tipo-informacao.enum';
 
 @Controller('v1/graficos')
 export class GraficosController {
@@ -156,7 +157,7 @@ export class GraficosController {
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
-  @Get('proventos/yield')
+  @Get('proventos/evolucao')
   async getYieldMonthly(
     @Query('periodo', {
       transform(value) {
@@ -164,6 +165,12 @@ export class GraficosController {
       },
     })
     periodo?: TipoPeriodo,
+    @Query('informacao', {
+      transform(value) {
+        return isNaN(value) ? TipoInformacao.YIELD_ON_COST : value;
+      },
+    })
+    informacao?: TipoInformacao,
   ): Promise<YieldMonthlyChartDto[]> {
     const [proventos, operacoes, ativos] = await Promise.all([
       this.proventosService.findAll({}, { dataPagamento: 'ASC' }),
@@ -210,7 +217,12 @@ export class GraficosController {
               ? toPercentRounded(proventoMes.valorUnitario / precoMedio)
               : 0;
 
-          item[ativo.ticker] = yieldOnCost;
+          item[ativo.ticker] =
+            informacao === TipoInformacao.YIELD_ON_COST
+              ? yieldOnCost
+              : informacao === TipoInformacao.PRECO_MEDIO
+              ? toRounded(precoMedio)
+              : proventoMes.valorUnitario;
         }
       });
     }
