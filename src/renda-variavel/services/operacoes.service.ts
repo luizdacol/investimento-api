@@ -8,6 +8,7 @@ import { TipoOperacao } from '../../enums/tipo-operacao.enum';
 import { AtivosService } from './ativos.service';
 import { TaxasNegociacaoDto } from '../dto/taxas-negociacao.dto';
 import { calcularFatorDesdobramentoPorData } from '../../utils/calculos';
+import { PaginatedDto } from '../dto/paginated.dto';
 
 @Injectable()
 export class OperacoesService {
@@ -39,13 +40,19 @@ export class OperacoesService {
   async findAll(
     filters: FindOptionsWhere<Operacao> = {},
     orderby: FindOptionsOrder<Operacao> = null,
-  ) {
-    const operacoes = await this.operacoesRepository.find({
-      where: filters,
-      relations: { ativo: true },
-      order: orderby || { data: 'ASC' },
-    });
-    return operacoes;
+    skip: number = 0,
+    take: number = null,
+  ): Promise<PaginatedDto<Operacao>> {
+    const [operacoes, totalRecords] =
+      await this.operacoesRepository.findAndCount({
+        skip: skip,
+        take: take,
+        where: filters,
+        relations: { ativo: true },
+        order: orderby || { data: 'ASC' },
+      });
+
+    return new PaginatedDto<Operacao>(operacoes, totalRecords, skip, take);
   }
 
   async findOne(id: number): Promise<Operacao> {

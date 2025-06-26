@@ -10,12 +10,15 @@ import {
   HttpStatus,
   ClassSerializerInterceptor,
   UseInterceptors,
+  Query,
 } from '@nestjs/common';
 import { OperacoesService } from '../services/operacoes.service';
 import { CreateOperacaoDto } from '../dto/create-operacao.dto';
 import { UpdateOperacaoDto } from '../dto/update-operacao.dto';
 import { Operacao } from '../entities/operacao.entity';
 import { TaxasNegociacaoDto } from '../dto/taxas-negociacao.dto';
+import { OperationParamsDto } from '../dto/operation-params.dto';
+import { PaginatedDto } from '../dto/paginated.dto';
 
 @Controller('v1/renda-variavel/operacoes')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -29,13 +32,20 @@ export class OperacoesController {
   }
 
   @Get()
-  findAll() {
-    return this.rendaVariavelService.findAll(undefined, { data: 'DESC' });
+  findAll(
+    @Query() params: OperationParamsDto,
+  ): Promise<PaginatedDto<Operacao>> {
+    return this.rendaVariavelService.findAll(
+      undefined,
+      { data: 'DESC' },
+      params.skip,
+      params.take,
+    );
   }
 
   @Get('taxas-impostos')
   async obterTaxas(): Promise<TaxasNegociacaoDto[]> {
-    const operacoes = await this.rendaVariavelService.findAll();
+    const { content: operacoes } = await this.rendaVariavelService.findAll();
 
     return this.rendaVariavelService.calcularTaxas(operacoes);
   }
