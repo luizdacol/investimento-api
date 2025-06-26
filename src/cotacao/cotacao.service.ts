@@ -7,7 +7,7 @@ import { AxiosError } from 'axios';
 import { ConfigService } from '@nestjs/config';
 import {
   TesouroDiretoResponseDto,
-  TreasureBondDto,
+  TreasureBondTradeList,
 } from './dto/tesouro-direto-response.dto';
 
 @Injectable()
@@ -37,18 +37,10 @@ export class CotacaoService {
     return rootResult.results[0];
   }
 
-  async getTesouroInformation(codigo: string): Promise<TreasureBondDto> {
-    const { data: tesouroDiretoResponse } = await firstValueFrom(
+  async getTesouroInformation(): Promise<TreasureBondTradeList[]> {
+    const { data: tesouroDiretoJson } = await firstValueFrom(
       this.httpService
-        .get<TesouroDiretoResponseDto>(
-          `https://www.tesourodireto.com.br/b3/tesourodireto/treasuryBondDetail?codigo=${codigo}`,
-          {
-            headers: {
-              Referer:
-                'https://www.tesourodireto.com.br/titulos/historico-de-precos-e-taxas.htm',
-            },
-          },
-        )
+        .get<TesouroDiretoResponseDto>('https://api.radaropcoes.com/bonds.json')
         .pipe(
           catchError((error: AxiosError) => {
             console.error(error.response.data);
@@ -57,6 +49,6 @@ export class CotacaoService {
         ),
     );
 
-    return tesouroDiretoResponse.response.TrsrBd;
+    return tesouroDiretoJson.response.TrsrBdTradgList;
   }
 }

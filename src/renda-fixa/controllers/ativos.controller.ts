@@ -43,19 +43,18 @@ export class AtivosController {
   async updatePrices(): Promise<boolean> {
     const ativos = await this._ativosService.findAll();
 
-    const cotacoesPromise = ativos
-      .filter((ativo) => !!ativo.codigo)
-      .map((ativo) => this._cotacaoService.getTesouroInformation(ativo.codigo));
-    const cotacoes = await Promise.all(cotacoesPromise);
+    const cotacoes = await this._cotacaoService.getTesouroInformation();
 
-    cotacoes.forEach((cotacao) => {
-      const ativo = ativos.find(
-        (ativo) => ativo.codigo === cotacao.cd.toString(),
+    ativos.forEach((ativo) => {
+      const cotacao = cotacoes.find(
+        (cotacao) => cotacao.TrsrBd.nm === ativo.titulo,
       );
-      this._ativosService.update(ativo.id, {
-        cotacao: cotacao.Pricg.untrRedVal,
-        dataHoraCotacao: new Date(),
-      });
+      if (cotacao) {
+        this._ativosService.update(ativo.id, {
+          cotacao: cotacao.TrsrBd.untrRedVal,
+          dataHoraCotacao: new Date(),
+        });
+      }
     });
 
     return true;
