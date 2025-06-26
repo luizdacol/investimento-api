@@ -26,14 +26,19 @@ export class CarteiraService {
   ) {}
 
   async calculateCarteira(dataDeCorte: Date = new Date()) {
-    const [operacoesRV, ativosRV, proventosRV, operacoesRF, ativosRF] =
-      await Promise.all([
-        this._operacoesRendaVariavelService.findAll(),
-        this._ativosRendaVariavelService.findAll({}),
-        this._proventosRendaVariavelService.findAll(),
-        this._operacoesRendaFixaService.findAll(),
-        this._ativosRendaFixaService.findAll({}),
-      ]);
+    const [
+      { content: operacoesRV },
+      ativosRV,
+      proventosRV,
+      operacoesRF,
+      ativosRF,
+    ] = await Promise.all([
+      this._operacoesRendaVariavelService.findAll(),
+      this._ativosRendaVariavelService.findAll({}),
+      this._proventosRendaVariavelService.findAll(),
+      this._operacoesRendaFixaService.findAll(),
+      this._ativosRendaFixaService.findAll({}),
+    ]);
 
     const arrayAtivos = new Array<AtivoRendaVariavel | AtivoRendaFixa>(
       ...ativosRF,

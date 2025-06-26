@@ -172,7 +172,7 @@ export class GraficosController {
     })
     informacao?: TipoInformacao,
   ): Promise<ProventosEvolucaoChartDto[]> {
-    const [proventos, operacoes, ativos] = await Promise.all([
+    const [proventos, { content: operacoes }, ativos] = await Promise.all([
       this.proventosService.findAll({}, { dataPagamento: 'ASC' }),
       this.operacoesService.findAll(),
       this.ativosService.findAll(),

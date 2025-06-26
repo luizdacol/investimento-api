@@ -51,7 +51,7 @@ export class ProventosService {
       ativo,
     );
 
-    const operacoes = await this.operacoesService.findAll();
+    const { content: operacoes } = await this.operacoesService.findAll();
     const { posicao } = this.operacoesService.calcularResumoOperacoes(
       operacoes,
       createProventoDto.ticker,
@@ -119,7 +119,7 @@ export class ProventosService {
       provento.ativo,
     );
 
-    const operacoes = await this.operacoesService.findAll();
+    const { content: operacoes } = await this.operacoesService.findAll();
     const { posicao } = this.operacoesService.calcularResumoOperacoes(
       operacoes,
       provento.ativo.ticker,
