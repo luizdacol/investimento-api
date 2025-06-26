@@ -17,7 +17,7 @@ import { CreateOperacaoDto } from '../dto/create-operacao.dto';
 import { UpdateOperacaoDto } from '../dto/update-operacao.dto';
 import { Operacao } from '../entities/operacao.entity';
 import { TaxasNegociacaoDto } from '../dto/taxas-negociacao.dto';
-import { OperationParamsDto } from '../dto/operation-params.dto';
+import { FindOperationsParamsDto } from '../dto/find-operations-params.dto';
 import { PaginatedDto } from '../dto/paginated.dto';
 
 @Controller('v1/renda-variavel/operacoes')
@@ -33,7 +33,7 @@ export class OperacoesController {
 
   @Get()
   findAll(
-    @Query() params: OperationParamsDto,
+    @Query() params: FindOperationsParamsDto,
   ): Promise<PaginatedDto<Operacao>> {
     return this.rendaVariavelService.findAll(
       undefined,
