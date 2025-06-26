@@ -29,7 +29,7 @@ export class CarteiraService {
     const [
       { content: operacoesRV },
       ativosRV,
-      proventosRV,
+      { content: proventosRV },
       operacoesRF,
       ativosRF,
     ] = await Promise.all([

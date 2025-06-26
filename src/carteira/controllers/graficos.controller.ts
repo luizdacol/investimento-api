@@ -110,7 +110,7 @@ export class GraficosController {
   @UseInterceptors(ClassSerializerInterceptor)
   @Get('proventos')
   async getProventos(): Promise<ProventosChartDto[]> {
-    const proventos = await this.proventosService.findAll();
+    const { content: proventos } = await this.proventosService.findAll();
 
     const initialValue = [];
     const startDate = new Date('2021-08-01T00:00:00.000Z');
@@ -172,11 +172,12 @@ export class GraficosController {
     })
     informacao?: TipoInformacao,
   ): Promise<ProventosEvolucaoChartDto[]> {
-    const [proventos, { content: operacoes }, ativos] = await Promise.all([
-      this.proventosService.findAll({}, { dataPagamento: 'ASC' }),
-      this.operacoesService.findAll(),
-      this.ativosService.findAll(),
-    ]);
+    const [{ content: proventos }, { content: operacoes }, ativos] =
+      await Promise.all([
+        this.proventosService.findAll({}, { dataPagamento: 'ASC' }),
+        this.operacoesService.findAll(),
+        this.ativosService.findAll(),
+      ]);
 
     const dadosPorPeriodo: ProventosEvolucaoChartDto[] =
       periodo === TipoPeriodo.ANUAL
