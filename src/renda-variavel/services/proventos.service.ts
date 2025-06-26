@@ -14,6 +14,7 @@ import { calcularFatorDesdobramentoPorData } from '../../utils/calculos';
 import { getUltimoDiaPorPeriodo } from '../../utils/helper';
 import { ResumoProventoPorDataDto } from '../dto/resumo-provento-por-data.dto';
 import { TipoAtivo } from '../../enums/tipo-ativo.enum';
+import { PaginatedDto } from '../dto/paginated.dto';
 
 @Injectable()
 export class ProventosService {
@@ -75,13 +76,19 @@ export class ProventosService {
   async findAll(
     filters: FindOptionsWhere<Provento> = {},
     orderby: FindOptionsOrder<Provento> = null,
-  ): Promise<Provento[]> {
-    const proventos = await this.proventosRepository.find({
-      where: filters,
-      relations: { ativo: true },
-      order: orderby || { dataPagamento: 'DESC' },
-    });
-    return proventos;
+    skip: number = 0,
+    take: number = null,
+  ): Promise<PaginatedDto<Provento>> {
+    const [proventos, totalRecords] =
+      await this.proventosRepository.findAndCount({
+        skip: skip,
+        take: take,
+        where: filters,
+        relations: { ativo: true },
+        order: orderby || { dataPagamento: 'DESC' },
+      });
+
+    return new PaginatedDto<Provento>(proventos, totalRecords, skip, take);
   }
 
   async findWithFilters(

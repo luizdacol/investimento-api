@@ -8,11 +8,14 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { ProventosService } from '../services/proventos.service';
 import { CreateProventoDto } from '../dto/create-provento.dto';
 import { UpdateProventoDto } from '../dto/update-provento.dto';
 import { Provento } from '../entities/provento.entity';
+import { FindProventosParamsDto } from '../dto/find-proventos-params.dto';
+import { PaginatedDto } from '../dto/paginated.dto';
 
 @Controller('v1/renda-variavel/proventos')
 export class ProventosController {
@@ -25,8 +28,15 @@ export class ProventosController {
   }
 
   @Get()
-  async findAll(): Promise<Provento[]> {
-    return this.proventosService.findAll();
+  async findAll(
+    @Query() params: FindProventosParamsDto,
+  ): Promise<PaginatedDto<Provento>> {
+    return this.proventosService.findAll(
+      undefined,
+      undefined,
+      params.skip,
+      params.take,
+    );
   }
 
   @Get(':id')
