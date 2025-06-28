@@ -86,6 +86,8 @@ export class CarteiraService {
       [TipoAtivo.TESOURO_DIRETO, new CarteiraRendaFixaDto('Total')],
     ]);
 
+    let totalCarteira = 0;
+
     const totais = carteira.reduce((kvPair, ativo) => {
       const totalDoTipo = kvPair.get(ativo.tipoAtivo);
 
@@ -93,9 +95,9 @@ export class CarteiraService {
       totalDoTipo.quantidade = 1;
       totalDoTipo.precoMedio += ativo.precoMedioTotal;
       totalDoTipo.precoMercado += ativo.precoMercadoTotal;
-      totalDoTipo.composicao += ativo.composicao;
-      totalDoTipo.composicaoTotal += ativo.composicaoTotal;
       totalDoTipo.dataHoraCotacao = new Date();
+
+      totalCarteira += ativo.precoMercadoTotal;
 
       if (
         totalDoTipo instanceof CarteiraRendaVariavelDto &&
@@ -108,6 +110,13 @@ export class CarteiraService {
 
       return kvPair;
     }, initialKvPair);
+
+    for (const total of totais.values()) {
+      total.composicao = 100;
+      total.composicaoTotal = toPercentRounded(
+        total.precoMercadoTotal / totalCarteira,
+      );
+    }
 
     carteira.push(...Array.from(totais.values()));
   }
