@@ -35,6 +35,8 @@ export class OperacoesController {
   findAll(
     @Query() params: FindOperationsParamsDto,
   ): Promise<PaginatedDto<Operacao>> {
+    if (params.take === -1) params.take = null;
+
     return this.rendaVariavelService.findAll(
       undefined,
       { data: 'DESC' },
