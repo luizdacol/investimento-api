@@ -15,6 +15,7 @@ export class AtivosService {
   async findAll(filters: FindOptionsWhere<Ativo> = {}): Promise<Ativo[]> {
     const ativos = await this._ativosRepository.find({
       where: filters,
+      order: { ticker: 'ASC' },
     });
     return ativos;
   }
