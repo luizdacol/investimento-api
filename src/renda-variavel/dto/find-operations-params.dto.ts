@@ -1,6 +1,6 @@
 import { Transform } from 'class-transformer';
 import { IsNumber, IsOptional } from 'class-validator';
-import { FindOperator, FindOptionsWhere, In } from 'typeorm';
+import { Between, FindOperator, FindOptionsWhere, In } from 'typeorm';
 
 export class FindOperationsParamsDto {
   @Transform((p) => Number(p.value))
@@ -30,6 +30,9 @@ export class FindOperationsParamsDto {
 
       if (operator === 'in') {
         findOperator = In(value.split(','));
+      } else if (operator === 'between') {
+        const [from, to] = value.split(',');
+        findOperator = Between(new Date(from), new Date(to));
       }
 
       const [entityName, entityValue] = this.parseFieldAndValue(
