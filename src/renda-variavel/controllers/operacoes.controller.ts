@@ -35,9 +35,11 @@ export class OperacoesController {
   findAll(
     @Query() params: FindOperationsParamsDto,
   ): Promise<PaginatedDto<Operacao>> {
+    const sortBy = params.parseSortBy();
+
     return this.rendaVariavelService.findAll(
       undefined,
-      { data: 'DESC' },
+      sortBy,
       params.skip,
       params.take,
     );
