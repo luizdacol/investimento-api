@@ -1,5 +1,6 @@
 import { Transform } from 'class-transformer';
 import { IsNumber, IsOptional } from 'class-validator';
+import { FindOperator, FindOptionsWhere, In } from 'typeorm';
 
 export class FindOperationsParamsDto {
   @Transform((p) => Number(p.value))
@@ -14,6 +15,45 @@ export class FindOperationsParamsDto {
 
   @IsOptional()
   sortBy?: string[];
+
+  @IsOptional()
+  filterBy?: string[];
+
+  parseFilterBy(): FindOptionsWhere<any> {
+    if (!this.filterBy) return null;
+
+    const filter: FindOptionsWhere<any> = {};
+
+    for (const param of this.filterBy) {
+      const [field, operator, value] = param.split('|');
+      let findOperator: FindOperator<any>;
+
+      if (operator === 'in') {
+        findOperator = In(value.split(','));
+      }
+
+      const [entityName, entityValue] = this.parseFieldAndValue(
+        field,
+        findOperator,
+      );
+
+      filter[entityName] = entityValue;
+    }
+
+    return filter;
+  }
+
+  parseFieldAndValue(field: string, value: any): any {
+    const [fieldFirstLevel, fieldSecondLevel] = field.split('.');
+    let parsedValue = value;
+
+    if (fieldSecondLevel) {
+      parsedValue = {};
+      parsedValue[fieldSecondLevel] = value;
+    }
+
+    return [fieldFirstLevel, parsedValue];
+  }
 
   parseSortBy() {
     if (!this.sortBy) return null;
