@@ -31,9 +31,11 @@ export class ProventosController {
   async findAll(
     @Query() params: FindProventosParamsDto,
   ): Promise<PaginatedDto<Provento>> {
+    const sortBy = params.parseSortBy();
+
     return this.proventosService.findAll(
       undefined,
-      undefined,
+      sortBy,
       params.skip,
       params.take,
     );
