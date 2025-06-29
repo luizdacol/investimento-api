@@ -26,27 +26,7 @@ export class FindOperationsParamsDto {
 
     for (const param of this.filterBy) {
       const [field, operator, value] = param.split('|');
-      let findOperator: FindOperator<any>;
-
-      if (operator === 'in') {
-        findOperator = In(value.split(','));
-      } else if (operator === 'between') {
-        const [from, to] = value.split(',');
-        if (
-          !isNaN(new Date(from).valueOf()) &&
-          !isNaN(new Date(to).valueOf())
-        ) {
-          findOperator = Between(new Date(from), new Date(to));
-        } else {
-          findOperator = Between(from, to);
-        }
-      } else if (operator === '=') {
-        if (!isNaN(new Date(value).valueOf())) {
-          findOperator = Equal(new Date(value));
-        } else {
-          findOperator = Equal(value);
-        }
-      }
+      const findOperator = this.mapFindOperator(operator, value);
 
       const [entityName, entityValue] = this.parseFieldAndValue(
         field,
@@ -59,6 +39,44 @@ export class FindOperationsParamsDto {
     return filter;
   }
 
+  parseSortBy() {
+    if (!this.sortBy) return null;
+
+    const sortByParsed = {};
+
+    for (const param of this.sortBy) {
+      const [field, order] = param.split('|');
+      const [entityName, entityValue] = this.parseFieldAndValue(field, order);
+
+      sortByParsed[entityName] = entityValue;
+    }
+    return sortByParsed;
+  }
+
+  mapFindOperator(operator: string, value: string) {
+    let findOperator: FindOperator<any>;
+    if (operator === 'in') {
+      findOperator = In(value.split(','));
+    } else if (operator === 'between') {
+      const [from, to] = value.split(',');
+      if (!isNaN(new Date(from).valueOf()) && !isNaN(new Date(to).valueOf())) {
+        findOperator = Between(new Date(from), new Date(to));
+      } else {
+        findOperator = Between(from, to);
+      }
+    } else if (operator === 'equals') {
+      if (!isNaN(new Date(value).valueOf())) {
+        findOperator = Equal(new Date(value));
+      } else {
+        findOperator = Equal(value);
+      }
+    } else {
+      throw new Error('Operador não implementado');
+    }
+
+    return findOperator;
+  }
+
   parseFieldAndValue(field: string, value: any): any {
     const [fieldFirstLevel, fieldSecondLevel] = field.split('.');
     let parsedValue = value;
@@ -69,26 +87,5 @@ export class FindOperationsParamsDto {
     }
 
     return [fieldFirstLevel, parsedValue];
-  }
-
-  parseSortBy() {
-    if (!this.sortBy) return null;
-
-    const sortByParsed = {};
-
-    for (const param of this.sortBy) {
-      const [field, order] = param.split('|');
-
-      if (field.indexOf('.') === -1) {
-        sortByParsed[field] = order;
-      } else {
-        const entity = {};
-        const [entityName, entityField] = field.split('.');
-        entity[entityField] = order;
-
-        sortByParsed[entityName] = entity;
-      }
-    }
-    return sortByParsed;
   }
 }
