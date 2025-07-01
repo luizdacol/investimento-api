@@ -16,6 +16,7 @@ import { UpdateProventoDto } from '../dto/update-provento.dto';
 import { Provento } from '../entities/provento.entity';
 import { FindProventosParamsDto } from '../dto/find-proventos-params.dto';
 import { PaginatedDto } from '../dto/paginated.dto';
+import { parseSortBy, parseFilterBy } from '../../utils/helper';
 
 @Controller('v1/renda-variavel/proventos')
 export class ProventosController {
@@ -31,10 +32,11 @@ export class ProventosController {
   async findAll(
     @Query() params: FindProventosParamsDto,
   ): Promise<PaginatedDto<Provento>> {
-    const sortBy = params.parseSortBy();
+    const sortBy = parseSortBy(params.sortBy);
+    const filterBy = parseFilterBy(params.filterBy);
 
     return this.proventosService.findAll(
-      undefined,
+      filterBy,
       sortBy,
       params.skip,
       params.take,
