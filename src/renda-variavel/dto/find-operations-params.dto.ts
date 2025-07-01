@@ -58,12 +58,7 @@ export class FindOperationsParamsDto {
     if (operator === 'in') {
       findOperator = In(value.split(','));
     } else if (operator === 'between') {
-      const [from, to] = value.split(',');
-      if (!isNaN(new Date(from).valueOf()) && !isNaN(new Date(to).valueOf())) {
-        findOperator = Between(new Date(from), new Date(to));
-      } else {
-        findOperator = Between(from, to);
-      }
+      findOperator = this.parseBetweenOperator(value);
     } else if (operator === 'equals') {
       if (!isNaN(new Date(value).valueOf())) {
         findOperator = Equal(new Date(value));
@@ -75,6 +70,23 @@ export class FindOperationsParamsDto {
     }
 
     return findOperator;
+  }
+
+  parseBetweenOperator(value: string): FindOperator<any> {
+    const [from, to] = value.split(',');
+
+    let fromDate = new Date(from);
+    let toDate = new Date(to);
+    if (isNaN(fromDate.valueOf()) && isNaN(toDate.valueOf())) {
+      return Between(from, to);
+    }
+
+    fromDate = isNaN(fromDate.valueOf())
+      ? new Date('2021-08-01T00:00:00.000Z')
+      : fromDate;
+    toDate = isNaN(toDate.valueOf()) ? new Date() : toDate;
+
+    return Between(fromDate, toDate);
   }
 
   parseFieldAndValue(field: string, value: any): any {
