@@ -19,6 +19,7 @@ import { Operacao } from '../entities/operacao.entity';
 import { TaxasNegociacaoDto } from '../dto/taxas-negociacao.dto';
 import { FindOperationsParamsDto } from '../dto/find-operations-params.dto';
 import { PaginatedDto } from '../dto/paginated.dto';
+import { parseFilterBy, parseSortBy } from '../../utils/helper';
 
 @Controller('v1/renda-variavel/operacoes')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -35,8 +36,8 @@ export class OperacoesController {
   findAll(
     @Query() params: FindOperationsParamsDto,
   ): Promise<PaginatedDto<Operacao>> {
-    const sortBy = params.parseSortBy();
-    const filterBy = params.parseFilterBy();
+    const sortBy = parseSortBy(params.sortBy);
+    const filterBy = parseFilterBy(params.filterBy);
 
     return this.rendaVariavelService.findAll(
       filterBy,
