@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CarteiraModule } from './carteira/carteira.module';
 import { RendaFixaModule } from './renda-fixa/renda-fixa.module';
 import { ConfigModule } from '@nestjs/config';
+import { CriptomoedasModule } from './criptomoedas/criptomoedas.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { ConfigModule } from '@nestjs/config';
     }),
     CarteiraModule,
     RendaFixaModule,
+    CriptomoedasModule,
   ],
   controllers: [AppController],
   providers: [AppService],
