@@ -51,4 +51,8 @@ export class CotacaoService {
 
     return tesouroDiretoJson.response.TrsrBdTradgList;
   }
+
+  async getCriptoInformation(): Promise<any> {
+    return Promise.resolve();
+  }
 }
