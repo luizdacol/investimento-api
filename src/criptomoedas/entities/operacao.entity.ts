@@ -30,14 +30,23 @@ export class Operacao {
   })
   precoUnitario: number;
 
-  @Column({ transformer: new ColumnNumericTransformer() })
+  @Column('numeric', { transformer: new ColumnNumericTransformer() })
   quantidade: number;
 
   @Column('numeric', {
-    name: 'preco_total',
+    name: 'valor_total_liquido',
     transformer: new ColumnNumericTransformer(),
   })
-  precoTotal: number;
+  valorTotalLiquido: number;
+
+  @Column('numeric', {
+    name: 'valor_total_bruto',
+    transformer: new ColumnNumericTransformer(),
+  })
+  valorTotalBruto: number;
+
+  @Column('numeric', { transformer: new ColumnNumericTransformer() })
+  taxa: number;
 
   @Column()
   tipo: TipoOperacao;
