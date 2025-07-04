@@ -17,7 +17,9 @@ export class CreateTablesCripto1751629257561 implements MigrationInterface {
                     data DATE NOT NULL,
                     preco_unitario NUMERIC(15,2)  NOT NULL,
                     quantidade NUMERIC(15,8) NOT NULL,
-                    preco_total NUMERIC(15,2) NOT NULL,
+                    valor_total_bruto NUMERIC(15,2) NOT NULL,
+                    taxa NUMERIC(15,8) NOT NULL,
+                    valor_total_liquido NUMERIC(15,2) NOT NULL,
                     tipo VARCHAR(30) NOT NULL,
                     FOREIGN KEY (ativo_id) REFERENCES ativos_cripto (id)
                 );`,
