@@ -5,15 +5,20 @@ import { AtivosService as AtivosRendaVariavelService } from '../../renda-variave
 import { ProventosService as ProventosRendaVariavelService } from '../../renda-variavel/services/proventos.service';
 import { OperacoesService as OperacoesRendaFixaService } from '../../renda-fixa/services/operacoes.service';
 import { AtivosService as AtivosRendaFixaService } from '../../renda-fixa/services/ativos.service';
+import { OperacoesService as OperacoesCriptomoedaService } from '../../criptomoedas/services/operacoes.service';
+import { AtivosService as AtivosCriptomoedaService } from '../../criptomoedas/services/ativos.service';
 import { CarteiraRendaFixaDto } from '../dto/carteira-renda-fixa.dto';
 import { Ativo as AtivoRendaVariavel } from '../../renda-variavel/entities/ativo.entity';
 import { Ativo as AtivoRendaFixa } from '../../renda-fixa/entities/ativo.entity';
+import { Ativo as AtivoCriptomoeda } from '../../criptomoedas/entities/ativo.entity';
 import { Provento } from '../../renda-variavel/entities/provento.entity';
 import { Operacao as OperacaoRendaVariavel } from '../../renda-variavel/entities/operacao.entity';
 import { Operacao as OperacaoRendaFixa } from '../../renda-fixa/entities/operacao.entity';
+import { Operacao as OperacaoCriptomoeda } from '../../criptomoedas/entities/operacao.entity';
 import { toPercentRounded } from '../../utils/helper';
 import { TipoAtivo } from '../../enums/tipo-ativo.enum';
 import { TipoPeriodo } from '../../enums/tipo-periodo.enum';
+import { CarteiraCriptomoedaDto } from '../dto/carteira-criptomoeda.dto';
 
 @Injectable()
 export class CarteiraService {
@@ -23,6 +28,8 @@ export class CarteiraService {
     private readonly _proventosRendaVariavelService: ProventosRendaVariavelService,
     private readonly _operacoesRendaFixaService: OperacoesRendaFixaService,
     private readonly _ativosRendaFixaService: AtivosRendaFixaService,
+    private readonly _ativosCriptomoedaService: AtivosCriptomoedaService,
+    private readonly _operacoesCriptomoedaService: OperacoesCriptomoedaService,
   ) {}
 
   async calculateCarteira(dataDeCorte: Date = new Date()) {
@@ -32,33 +39,48 @@ export class CarteiraService {
       { content: proventosRV },
       operacoesRF,
       ativosRF,
+      { content: operacoesCripto },
+      ativosCripto,
     ] = await Promise.all([
       this._operacoesRendaVariavelService.findAll(),
       this._ativosRendaVariavelService.findAll({}),
       this._proventosRendaVariavelService.findAll(),
       this._operacoesRendaFixaService.findAll(),
       this._ativosRendaFixaService.findAll({}),
+      this._operacoesCriptomoedaService.findAll(),
+      this._ativosCriptomoedaService.findAll({}),
     ]);
 
-    const arrayAtivos = new Array<AtivoRendaVariavel | AtivoRendaFixa>(
-      ...ativosRF,
-      ...ativosRV,
-    );
+    const arrayAtivos = new Array<
+      AtivoRendaVariavel | AtivoRendaFixa | AtivoCriptomoeda
+    >(...ativosRF, ...ativosRV, ...ativosCripto);
 
-    const carteira: (CarteiraRendaVariavelDto | CarteiraRendaFixaDto)[] = [];
+    const carteira: (
+      | CarteiraRendaVariavelDto
+      | CarteiraRendaFixaDto
+      | CarteiraCriptomoedaDto
+    )[] = [];
 
     for (const ativo of arrayAtivos) {
-      let ativoNaCarteira: CarteiraRendaVariavelDto | CarteiraRendaFixaDto;
+      let ativoNaCarteira:
+        | CarteiraRendaVariavelDto
+        | CarteiraRendaFixaDto
+        | CarteiraCriptomoedaDto;
       if (ativo instanceof AtivoRendaVariavel) {
         ativoNaCarteira = this.calculateAtivoRV(
           ativo,
           operacoesRV.filter((d) => d.data <= dataDeCorte),
           proventosRV.filter((d) => d.dataCom <= dataDeCorte),
         );
-      } else {
+      } else if (ativo instanceof AtivoRendaFixa) {
         ativoNaCarteira = this.calculateAtivoRF(
           ativo,
           operacoesRF.filter((d) => d.data <= dataDeCorte),
+        );
+      } else {
+        ativoNaCarteira = this.calculateAtivoCripto(
+          ativo,
+          operacoesCripto.filter((d) => d.data <= dataDeCorte),
         );
       }
 
@@ -72,11 +94,15 @@ export class CarteiraService {
   }
 
   calculateTotal(
-    carteira: (CarteiraRendaVariavelDto | CarteiraRendaFixaDto)[],
+    carteira: (
+      | CarteiraRendaVariavelDto
+      | CarteiraRendaFixaDto
+      | CarteiraCriptomoedaDto
+    )[],
   ) {
     const initialKvPair = new Map<
       string,
-      CarteiraRendaVariavelDto | CarteiraRendaFixaDto
+      CarteiraRendaVariavelDto | CarteiraRendaFixaDto | CarteiraCriptomoedaDto
     >([
       [TipoAtivo.FII, new CarteiraRendaVariavelDto('Total')],
       [TipoAtivo.ACAO, new CarteiraRendaVariavelDto('Total')],
@@ -84,6 +110,7 @@ export class CarteiraService {
       [TipoAtivo.ETF, new CarteiraRendaVariavelDto('Total')],
       [TipoAtivo.CDB, new CarteiraRendaFixaDto('Total')],
       [TipoAtivo.TESOURO_DIRETO, new CarteiraRendaFixaDto('Total')],
+      [TipoAtivo.CRIPTOMOEDA, new CarteiraCriptomoedaDto('Total')],
     ]);
 
     let totalCarteira = 0;
@@ -122,7 +149,11 @@ export class CarteiraService {
   }
 
   calculateComposicao(
-    carteira: (CarteiraRendaVariavelDto | CarteiraRendaFixaDto)[],
+    carteira: (
+      | CarteiraRendaVariavelDto
+      | CarteiraRendaFixaDto
+      | CarteiraCriptomoedaDto
+    )[],
   ): void {
     let totalCarteira = 0;
     const total = carteira.reduce((kvPair, ativo) => {
@@ -199,6 +230,29 @@ export class CarteiraService {
       ativoNaCarteira.quantidade > 0
         ? valorTotal / ativoNaCarteira.quantidade
         : 0;
+
+    ativoNaCarteira.precoMercado = ativo.cotacao || 0;
+    ativoNaCarteira.dataHoraCotacao = ativo.dataHoraCotacao || new Date();
+
+    return ativoNaCarteira;
+  }
+
+  calculateAtivoCripto(
+    ativo: AtivoCriptomoeda,
+    operacoes: OperacaoCriptomoeda[],
+  ): CarteiraCriptomoedaDto {
+    const ativoNaCarteira = new CarteiraCriptomoedaDto(ativo.codigo);
+
+    const { precoMedio, posicao } =
+      this._operacoesCriptomoedaService.calcularResumoOperacoes(
+        operacoes,
+        ativo.codigo,
+        new Date(),
+      );
+
+    ativoNaCarteira.tipoAtivo = 'Criptomoeda';
+    ativoNaCarteira.quantidade = posicao;
+    ativoNaCarteira.precoMedio = precoMedio;
 
     ativoNaCarteira.precoMercado = ativo.cotacao || 0;
     ativoNaCarteira.dataHoraCotacao = ativo.dataHoraCotacao || new Date();

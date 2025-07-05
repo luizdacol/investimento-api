@@ -6,6 +6,7 @@ import { Operacao } from '../entities/operacao.entity';
 import { AtivosService } from './ativos.service';
 import { CreateOperacaoDto } from '../dto/create-operacao.dto';
 import { PaginatedDto } from '../dto/paginated.dto';
+import { TipoOperacao } from '../../enums/tipo-operacao.enum';
 
 @Injectable()
 export class OperacoesService {
@@ -101,59 +102,44 @@ export class OperacoesService {
     return result.affected > 0;
   }
 
-  // public calcularResumoOperacoes(
-  //   operacoes: Operacao[],
-  //   ticker: string,
-  //   dataBase: Date = new Date(),
-  // ): {
-  //   precoMedio: number;
-  //   precoTotal: number;
-  //   posicao: number;
-  // } {
-  //   const fatorDesdobramentoPorData = calcularFatorDesdobramentoPorData(
-  //     operacoes.filter((o) => o.ativo.ticker === ticker).map((o) => o.data),
-  //     operacoes.filter((o) => o.ativo.ticker === ticker),
-  //   );
+  public calcularResumoOperacoes(
+    operacoes: Operacao[],
+    codigo: string,
+    dataBase: Date = new Date(),
+  ): {
+    precoMedio: number;
+    valorTotalLiquido: number;
+    posicao: number;
+  } {
+    const operacoesDoAtivo = operacoes.filter((o) =>
+      this.filtroPorTickerEData(o, codigo, dataBase),
+    );
 
-  //   const operacoesDoAtivo = operacoes.filter((o) =>
-  //     this.filtroPorTickerEData(o, ticker, dataBase),
-  //   );
+    return operacoesDoAtivo.reduce(
+      (operacaoResumida, operacaoAtual) => {
+        if (operacaoAtual.tipo === TipoOperacao.COMPRA) {
+          operacaoResumida.posicao += operacaoAtual.quantidade;
 
-  //   return operacoesDoAtivo.reduce(
-  //     (operacaoResumida, operacaoAtual) => {
-  //       if (
-  //         operacaoAtual.tipo === TipoOperacao.COMPRA ||
-  //         operacaoAtual.tipo === TipoOperacao.BONIFICACAO ||
-  //         operacaoAtual.tipo === TipoOperacao.ATUALIZACAO
-  //       ) {
-  //         operacaoResumida.posicao +=
-  //           operacaoAtual.quantidade *
-  //           fatorDesdobramentoPorData.get(operacaoAtual.data.toISOString());
+          operacaoResumida.valorTotalLiquido += operacaoAtual.valorTotalLiquido;
+          operacaoResumida.precoMedio =
+            operacaoResumida.valorTotalLiquido / operacaoResumida.posicao;
+        } else if (operacaoAtual.tipo === TipoOperacao.VENDA) {
+          operacaoResumida.posicao -= operacaoAtual.quantidade;
+          operacaoResumida.valorTotalLiquido =
+            operacaoResumida.posicao * operacaoResumida.precoMedio;
+        }
 
-  //         operacaoResumida.precoTotal += operacaoAtual.precoTotal;
-  //         operacaoResumida.precoMedio =
-  //           operacaoResumida.precoTotal / operacaoResumida.posicao;
-  //       } else if (operacaoAtual.tipo === TipoOperacao.AMORTIZACAO) {
-  //         operacaoResumida.precoTotal -= operacaoAtual.precoTotal;
-  //         operacaoResumida.precoMedio =
-  //           operacaoResumida.precoTotal / operacaoResumida.posicao;
-  //       } else if (operacaoAtual.tipo === TipoOperacao.VENDA) {
-  //         operacaoResumida.posicao -= operacaoAtual.quantidade;
-  //         operacaoResumida.precoTotal =
-  //           operacaoResumida.posicao * operacaoResumida.precoMedio;
-  //       }
+        return operacaoResumida;
+      },
+      {
+        valorTotalLiquido: 0,
+        precoMedio: 0,
+        posicao: 0,
+      },
+    );
+  }
 
-  //       return operacaoResumida;
-  //     },
-  //     {
-  //       precoTotal: 0,
-  //       precoMedio: 0,
-  //       posicao: 0,
-  //     },
-  //   );
-  // }
-
-  // private filtroPorTickerEData(o: Operacao, ticker: string, dataBase: Date) {
-  //   return o.ativo.ticker === ticker && o.data <= dataBase;
-  // }
+  private filtroPorTickerEData(o: Operacao, codigo: string, dataBase: Date) {
+    return o.ativo.codigo === codigo && o.data <= dataBase;
+  }
 }

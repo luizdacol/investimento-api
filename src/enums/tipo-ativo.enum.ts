@@ -5,4 +5,5 @@ export enum TipoAtivo {
   TESOURO_DIRETO = 'TesouroDireto',
   CDB = 'CDB',
   ETF = 'ETF',
+  CRIPTOMOEDA = 'Criptomoeda',
 }
