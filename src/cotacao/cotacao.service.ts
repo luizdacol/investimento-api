@@ -9,6 +9,7 @@ import {
   TesouroDiretoResponseDto,
   TreasureBondTradeList,
 } from './dto/tesouro-direto-response.dto';
+import { CriptoResponseDto } from './dto/cripto-response.dto';
 
 @Injectable()
 export class CotacaoService {
@@ -52,7 +53,21 @@ export class CotacaoService {
     return tesouroDiretoJson.response.TrsrBdTradgList;
   }
 
-  async getCriptoInformation(): Promise<any> {
-    return Promise.resolve();
+  //Método preparado para buscar apenas a cotação de BTC
+  async getCriptoInformation(): Promise<CriptoResponseDto> {
+    const data = await firstValueFrom(
+      this.httpService
+        .get<CriptoResponseDto>(
+          'https://cointradermonitor.com/api/pbb/v1/ticker',
+        )
+        .pipe(
+          catchError((error: AxiosError) => {
+            console.error(error.response.data);
+            throw 'An error happened!';
+          }),
+        ),
+    );
+
+    return data.data;
   }
 }
