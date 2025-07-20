@@ -8,7 +8,6 @@ export class ResponseOperacao {
   precoUnitario: number;
   precoTotal: number;
   rentabilidade: string;
-  dataVencimento: Date;
   tipoAtivo: string;
   tipoOperacao: string;
 
@@ -21,7 +20,6 @@ export class ResponseOperacao {
       precoUnitario: operacao.precoUnitario,
       precoTotal: operacao.precoTotal,
       rentabilidade: operacao.rentabilidade,
-      dataVencimento: operacao.dataVencimento,
       tipoAtivo: operacao.ativo.tipo,
       tipoOperacao: operacao.tipo,
     } as ResponseOperacao;

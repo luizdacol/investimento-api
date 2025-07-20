@@ -42,12 +42,6 @@ export class Operacao {
   @Column()
   rentabilidade: string;
 
-  @Column('date', {
-    name: 'data_vencimento',
-    transformer: new DateTransformer(),
-  })
-  dataVencimento: Date;
-
   @Column()
   tipo: TipoOperacao;
 }

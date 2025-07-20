@@ -29,7 +29,6 @@ export class OperacoesService {
       quantidade: createOperacaoDto.quantidade,
       tipo: createOperacaoDto.tipoOperacao,
       rentabilidade: createOperacaoDto.rentabilidade,
-      dataVencimento: createOperacaoDto.dataVencimento,
       ativo,
     });
 
@@ -69,8 +68,6 @@ export class OperacoesService {
       operacao.precoUnitario = updateAtivoDto.precoUnitario;
     if (updateAtivoDto.rentabilidade)
       operacao.rentabilidade = updateAtivoDto.rentabilidade;
-    if (updateAtivoDto.dataVencimento)
-      operacao.dataVencimento = updateAtivoDto.dataVencimento;
     if (updateAtivoDto.tipoOperacao)
       operacao.tipo = updateAtivoDto.tipoOperacao;
 

@@ -53,6 +53,8 @@ export class AtivosService {
     if (updateAtivoDto.cotacao) ativo.cotacao = updateAtivoDto.cotacao;
     if (updateAtivoDto.dataHoraCotacao)
       ativo.dataHoraCotacao = updateAtivoDto.dataHoraCotacao;
+    if (updateAtivoDto.dataVencimento)
+      ativo.dataVencimento = updateAtivoDto.dataVencimento;
 
     const result = await this._ativosRepository.update({ id: id }, ativo);
     return result.affected > 0;

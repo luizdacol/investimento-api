@@ -27,10 +27,6 @@ export class CreateOperacaoDto {
   @IsString()
   rentabilidade?: string;
 
-  @IsDate()
-  @Type(() => Date)
-  dataVencimento: Date;
-
   @IsString()
   @IsOptional()
   codigo?: string;

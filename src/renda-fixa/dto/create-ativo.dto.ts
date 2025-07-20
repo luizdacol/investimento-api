@@ -29,4 +29,8 @@ export class CreateAtivoDto {
   @Type(() => Date)
   @IsOptional()
   dataHoraCotacao?: Date;
+
+  @IsDate()
+  @Type(() => Date)
+  dataVencimento: Date;
 }

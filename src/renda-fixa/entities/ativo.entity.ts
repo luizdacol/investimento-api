@@ -1,6 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { TipoAtivo } from '../../enums/tipo-ativo.enum';
 import { ColumnNumericTransformer } from '../../transformers/ColumnNumericTransformer';
+import { DateTransformer } from '../../transformers/DateTransformer';
 
 @Entity('ativos_renda_fixa')
 export class Ativo {
@@ -25,4 +26,10 @@ export class Ativo {
     name: 'data_hora_cotacao',
   })
   dataHoraCotacao?: Date;
+
+  @Column('date', {
+    name: 'data_vencimento',
+    transformer: new DateTransformer(),
+  })
+  dataVencimento: Date;
 }
