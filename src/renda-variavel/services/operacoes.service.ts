@@ -336,4 +336,16 @@ export class OperacoesService {
 
     return lucroPrejuizoDto;
   }
+
+  async updatePrejuizoCompensado(
+    id: number,
+    prejuizoCompensado: number,
+  ): Promise<boolean> {
+    const result = await this.lucrosPrejuizosRepository.update(
+      { id: id },
+      { prejuizoCompensado: prejuizoCompensado },
+    );
+
+    return result.affected > 0;
+  }
 }

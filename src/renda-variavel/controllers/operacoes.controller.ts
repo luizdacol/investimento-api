@@ -60,6 +60,17 @@ export class OperacoesController {
     return this.rendaVariavelService.getLucrosPrejuizosPorClasse();
   }
 
+  @Patch('lucros-prejuizos/:id')
+  async atualizarPrejuizoCompensar(
+    @Param('id') id: number,
+    @Body() updatePrejuizo: { prejuizoCompensado: number },
+  ): Promise<boolean> {
+    return this.rendaVariavelService.updatePrejuizoCompensado(
+      id,
+      updatePrejuizo.prejuizoCompensado,
+    );
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<Operacao> {
     return this.rendaVariavelService.findOne(+id);
