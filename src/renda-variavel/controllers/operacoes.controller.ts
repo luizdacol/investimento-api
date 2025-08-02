@@ -20,6 +20,7 @@ import { TaxasNegociacaoDto } from '../dto/taxas-negociacao.dto';
 import { FindOperationsParamsDto } from '../dto/find-operations-params.dto';
 import { PaginatedDto } from '../dto/paginated.dto';
 import { parseFilterBy, parseSortBy } from '../../utils/helper';
+import { LucrosPrejuizosDto } from '../dto/lucros-prejuizos.dto';
 
 @Controller('v1/renda-variavel/operacoes')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -52,6 +53,11 @@ export class OperacoesController {
     const { content: operacoes } = await this.rendaVariavelService.findAll();
 
     return this.rendaVariavelService.calcularTaxas(operacoes);
+  }
+
+  @Get('lucros-prejuizos')
+  async obterLucrosPrejuizos(): Promise<LucrosPrejuizosDto[]> {
+    return this.rendaVariavelService.getLucrosPrejuizosPorClasse();
   }
 
   @Get(':id')

@@ -19,6 +19,7 @@ import { TipoAtivo } from '../../enums/tipo-ativo.enum';
 import { getUltimoDiaPorPeriodo } from '../../utils/helper';
 import { TipoPeriodo } from '../../enums/tipo-periodo.enum';
 import { LucrosPrejuizos } from '../entities/lucros-prejuizos.entity';
+import { LucrosPrejuizosDto } from '../dto/lucros-prejuizos.dto';
 
 @Injectable()
 export class OperacoesService {
@@ -290,5 +291,49 @@ export class OperacoesService {
     } else {
       await this.lucrosPrejuizosRepository.save(balancoDoMes);
     }
+  }
+
+  async getLucrosPrejuizosPorClasse(): Promise<LucrosPrejuizosDto[]> {
+    const lucrosPrejuizos = await this.lucrosPrejuizosRepository.find({
+      order: {
+        tipo: 'ASC',
+        data: 'ASC',
+      },
+    });
+
+    const lucroPrejuizoDto: LucrosPrejuizosDto[] = [];
+    for (const item of lucrosPrejuizos) {
+      let lucroPrejuizoPorClasse = lucroPrejuizoDto.find(
+        (lp) => lp.classeAtivo === item.tipo,
+      );
+      if (!lucroPrejuizoPorClasse) {
+        lucroPrejuizoDto.push({
+          classeAtivo: item.tipo,
+          saldoParaCompensar: 0,
+          balancoMensal: [],
+        });
+        lucroPrejuizoPorClasse = lucroPrejuizoDto.find(
+          (lp) => lp.classeAtivo === item.tipo,
+        );
+      }
+
+      lucroPrejuizoPorClasse.balancoMensal.push({
+        id: item.id,
+        data: item.data,
+        lucro: item.lucro,
+        prejuizo: item.prejuizo,
+        prejuizoCompensado: item.prejuizoCompensado,
+      });
+
+      const saldoDoMes = item.prejuizoCompensado + item.prejuizo;
+      if (saldoDoMes < 0 || lucroPrejuizoPorClasse.saldoParaCompensar < 0) {
+        lucroPrejuizoPorClasse.saldoParaCompensar += saldoDoMes;
+      }
+
+      if (lucroPrejuizoPorClasse.saldoParaCompensar > 0)
+        lucroPrejuizoPorClasse.saldoParaCompensar = 0;
+    }
+
+    return lucroPrejuizoDto;
   }
 }
