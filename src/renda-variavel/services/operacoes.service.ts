@@ -80,27 +80,56 @@ export class OperacoesService {
 
   async update(
     id: number,
-    updateAtivoDto: UpdateOperacaoDto,
+    updateOperacaooDto: UpdateOperacaoDto,
   ): Promise<boolean> {
     const operacao = await this.findOne(id);
     if (!operacao) throw Error('Operação não encontrada');
 
-    if (updateAtivoDto.data) operacao.data = updateAtivoDto.data;
-    if (updateAtivoDto.quantidade)
-      operacao.quantidade = updateAtivoDto.quantidade;
-    if (updateAtivoDto.precoUnitario)
-      operacao.precoUnitario = updateAtivoDto.precoUnitario;
-    if (updateAtivoDto.tipoOperacao)
-      operacao.tipo = updateAtivoDto.tipoOperacao;
+    const mesAntesDaAlteracao = operacao.data;
+
+    if (updateOperacaooDto.data) operacao.data = updateOperacaooDto.data;
+    if (updateOperacaooDto.quantidade)
+      operacao.quantidade = updateOperacaooDto.quantidade;
+    if (updateOperacaooDto.precoUnitario)
+      operacao.precoUnitario = updateOperacaooDto.precoUnitario;
+    if (updateOperacaooDto.tipoOperacao)
+      operacao.tipo = updateOperacaooDto.tipoOperacao;
 
     operacao.precoTotal = operacao.precoUnitario * operacao.quantidade;
 
     const result = await this.operacoesRepository.update({ id: id }, operacao);
+
+    // Decisão tomada de recalcular apenas quando for VENDA por questão de simplicidade do código
+    // visto que no momento da venda, os precos de compra terão sido validados já e dificilmente estarão errados
+    if (updateOperacaooDto.tipoOperacao === TipoOperacao.VENDA) {
+      await this.calcularLucrosPrejuizos(
+        updateOperacaooDto.data,
+        operacao.ativo.tipo,
+      );
+
+      // Se mudar o mes da venda, tem que recalcular o saldo do mes de antes da alteração também
+      if (
+        updateOperacaooDto.data.getMonth() !== mesAntesDaAlteracao.getMonth()
+      ) {
+        await this.calcularLucrosPrejuizos(
+          mesAntesDaAlteracao,
+          operacao.ativo.tipo,
+        );
+      }
+    }
+
     return result.affected > 0;
   }
 
   async remove(id: number): Promise<boolean> {
+    const operacao = await this.findOne(id);
+    if (!operacao) throw Error('Operação não encontrada');
+
     const result = await this.operacoesRepository.delete({ id: id });
+
+    if (operacao.tipo === TipoOperacao.VENDA) {
+      await this.calcularLucrosPrejuizos(operacao.data, operacao.ativo.tipo);
+    }
     return result.affected > 0;
   }
 
@@ -189,7 +218,16 @@ export class OperacoesService {
   }
 
   async calcularLucrosPrejuizos(dataVenda: Date, tipoAtivo: TipoAtivo) {
-    console.log('Calculando lucros e prejuizos');
+    console.log(
+      `Calculando lucros e prejuizos do mes ${dataVenda.toLocaleDateString(
+        'pt-BR',
+        {
+          timeZone: 'UTC',
+          month: '2-digit',
+          year: 'numeric',
+        },
+      )}`,
+    );
 
     const startDate = new Date(
       dataVenda.getUTCFullYear(),
