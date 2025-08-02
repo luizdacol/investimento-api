@@ -2,19 +2,31 @@ import { Injectable } from '@nestjs/common';
 import { CreateOperacaoDto } from '../dto/create-operacao.dto';
 import { UpdateOperacaoDto } from '../dto/update-operacao.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsOrder, FindOptionsWhere, Repository } from 'typeorm';
+import {
+  Between,
+  FindOptionsOrder,
+  FindOptionsWhere,
+  In,
+  Repository,
+} from 'typeorm';
 import { Operacao } from '../entities/operacao.entity';
 import { TipoOperacao } from '../../enums/tipo-operacao.enum';
 import { AtivosService } from './ativos.service';
 import { TaxasNegociacaoDto } from '../dto/taxas-negociacao.dto';
 import { calcularFatorDesdobramentoPorData } from '../../utils/calculos';
 import { PaginatedDto } from '../dto/paginated.dto';
+import { TipoAtivo } from '../../enums/tipo-ativo.enum';
+import { getUltimoDiaPorPeriodo } from '../../utils/helper';
+import { TipoPeriodo } from '../../enums/tipo-periodo.enum';
+import { LucrosPrejuizos } from '../entities/lucros-prejuizos.entity';
 
 @Injectable()
 export class OperacoesService {
   constructor(
     @InjectRepository(Operacao)
     private operacoesRepository: Repository<Operacao>,
+    @InjectRepository(LucrosPrejuizos)
+    private lucrosPrejuizosRepository: Repository<LucrosPrejuizos>,
     private _ativosService: AtivosService,
   ) {}
 
@@ -24,7 +36,7 @@ export class OperacoesService {
     );
     if (!ativo) throw Error('Ativo não encontrado');
 
-    const operacaoSaved = this.operacoesRepository.save({
+    const operacaoSaved = await this.operacoesRepository.save({
       data: createOperacaoDto.data,
       precoTotal:
         createOperacaoDto.precoUnitario * createOperacaoDto.quantidade,
@@ -33,6 +45,10 @@ export class OperacoesService {
       tipo: createOperacaoDto.tipoOperacao,
       ativo,
     });
+
+    if (createOperacaoDto.tipoOperacao === TipoOperacao.VENDA) {
+      await this.calcularLucrosPrejuizos(createOperacaoDto.data, ativo.tipo);
+    }
 
     return operacaoSaved;
   }
@@ -170,5 +186,71 @@ export class OperacoesService {
 
   private filtroPorTickerEData(o: Operacao, ticker: string, dataBase: Date) {
     return o.ativo.ticker === ticker && o.data <= dataBase;
+  }
+
+  async calcularLucrosPrejuizos(dataVenda: Date, tipoAtivo: TipoAtivo) {
+    console.log('Calculando lucros e prejuizos');
+
+    const startDate = new Date(
+      dataVenda.getUTCFullYear(),
+      dataVenda.getUTCMonth(),
+      1,
+    );
+    const endDate = getUltimoDiaPorPeriodo(dataVenda, TipoPeriodo.MENSAL);
+
+    const grupoAcao = [TipoAtivo.ACAO, TipoAtivo.BDR, TipoAtivo.ETF];
+    const tiposAtivo = grupoAcao.includes(tipoAtivo) ? grupoAcao : [tipoAtivo];
+
+    const [
+      { content: operacoes },
+      { content: operacoesVendaDoMes },
+      lucroPrejuizoMes,
+    ] = await Promise.all([
+      this.findAll(),
+      this.findAll({
+        tipo: TipoOperacao.VENDA,
+        data: Between(startDate, endDate),
+        ativo: { tipo: In(tiposAtivo) },
+      }),
+      this.lucrosPrejuizosRepository.findOneBy({
+        data: endDate,
+        tipo: grupoAcao.includes(tipoAtivo) ? TipoAtivo.ACAO : tipoAtivo,
+      }),
+    ]);
+
+    const balancoDoMes = {
+      data: endDate,
+      lucro: 0,
+      prejuizo: 0,
+      prejuizoCompensado: 0,
+      tipo: grupoAcao.includes(tipoAtivo) ? TipoAtivo.ACAO : tipoAtivo,
+    } as LucrosPrejuizos;
+
+    for (const venda of operacoesVendaDoMes) {
+      const dataAntesDaVenda = new Date(venda.data.getTime());
+      dataAntesDaVenda.setDate(venda.data.getDate() - 1);
+
+      const { precoMedio } = this.calcularResumoOperacoes(
+        operacoes,
+        venda.ativo.ticker,
+        dataAntesDaVenda,
+      );
+      const saldoOperacao =
+        (venda.precoUnitario - precoMedio) * venda.quantidade;
+      if (saldoOperacao > 0) {
+        balancoDoMes.lucro += saldoOperacao;
+      } else {
+        balancoDoMes.prejuizo += saldoOperacao;
+      }
+    }
+
+    if (lucroPrejuizoMes) {
+      await this.lucrosPrejuizosRepository.update(
+        { id: lucroPrejuizoMes.id },
+        balancoDoMes,
+      );
+    } else {
+      await this.lucrosPrejuizosRepository.save(balancoDoMes);
+    }
   }
 }

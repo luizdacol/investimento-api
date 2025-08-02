@@ -11,10 +11,11 @@ import { AtivosService } from './services/ativos.service';
 import { CotacaoModule } from '../cotacao/cotacao.module';
 import { AtivosController } from './controllers/ativos.controller';
 import { GraficosController } from './controllers/graficos.controller';
+import { LucrosPrejuizos } from './entities/lucros-prejuizos.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Ativo, Operacao, Provento]),
+    TypeOrmModule.forFeature([Ativo, Operacao, Provento, LucrosPrejuizos]),
     CotacaoModule,
   ],
   controllers: [
