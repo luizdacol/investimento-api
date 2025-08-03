@@ -11,7 +11,11 @@ describe('OperacoesService (Renda Variavel)', () => {
     operacoes: [],
   };
 
-  const operacoesService: OperacoesService = new OperacoesService(null, null);
+  const operacoesService: OperacoesService = new OperacoesService(
+    null,
+    null,
+    null,
+  );
 
   describe('calcularResumoOperacoes', () => {
     describe('quando houver apenas 1 compra', () => {
