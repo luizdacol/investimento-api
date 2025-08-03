@@ -7,6 +7,7 @@ export class CarteiraCriptomoedaDto {
 
   codigo: string;
   tipoAtivo: string;
+  classeAtivo: string;
   quantidade: number = 0;
   precoMedio: number = 0;
   precoMercado: number = 0;

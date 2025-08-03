@@ -16,9 +16,9 @@ import { Operacao as OperacaoRendaVariavel } from '../../renda-variavel/entities
 import { Operacao as OperacaoRendaFixa } from '../../renda-fixa/entities/operacao.entity';
 import { Operacao as OperacaoCriptomoeda } from '../../criptomoedas/entities/operacao.entity';
 import { toPercentRounded } from '../../utils/helper';
-import { TipoAtivo } from '../../enums/tipo-ativo.enum';
 import { TipoPeriodo } from '../../enums/tipo-periodo.enum';
 import { CarteiraCriptomoedaDto } from '../dto/carteira-criptomoeda.dto';
+import { ClasseAtivo } from '../../enums/classe-ativo.enum';
 
 @Injectable()
 export class CarteiraService {
@@ -104,36 +104,34 @@ export class CarteiraService {
       string,
       CarteiraRendaVariavelDto | CarteiraRendaFixaDto | CarteiraCriptomoedaDto
     >([
-      [TipoAtivo.FII, new CarteiraRendaVariavelDto('Total')],
-      [TipoAtivo.ACAO, new CarteiraRendaVariavelDto('Total')],
-      [TipoAtivo.BDR, new CarteiraRendaVariavelDto('Total')],
-      [TipoAtivo.ETF, new CarteiraRendaVariavelDto('Total')],
-      [TipoAtivo.CDB, new CarteiraRendaFixaDto('Total')],
-      [TipoAtivo.TESOURO_DIRETO, new CarteiraRendaFixaDto('Total')],
-      [TipoAtivo.CRIPTOMOEDA, new CarteiraCriptomoedaDto('Total')],
+      [ClasseAtivo.FUNDO_IMOBILIARIO, new CarteiraRendaVariavelDto('Total')],
+      [ClasseAtivo.BOLSA_BRASILEIRA, new CarteiraRendaVariavelDto('Total')],
+      [ClasseAtivo.CDB, new CarteiraRendaFixaDto('Total')],
+      [ClasseAtivo.TESOURO_DIRETO, new CarteiraRendaFixaDto('Total')],
+      [ClasseAtivo.CRIPTOMOEDA, new CarteiraCriptomoedaDto('Total')],
     ]);
 
     let totalCarteira = 0;
 
     const totais = carteira.reduce((kvPair, ativo) => {
-      const totalDoTipo = kvPair.get(ativo.tipoAtivo);
+      const totalDaClasse = kvPair.get(ativo.classeAtivo);
 
-      totalDoTipo.tipoAtivo = ativo.tipoAtivo;
-      totalDoTipo.quantidade = 1;
-      totalDoTipo.precoMedio += ativo.precoMedioTotal;
-      totalDoTipo.precoMercado += ativo.precoMercadoTotal;
-      totalDoTipo.dataHoraCotacao = new Date();
+      totalDaClasse.classeAtivo = ativo.classeAtivo;
+      totalDaClasse.quantidade = 1;
+      totalDaClasse.precoMedio += ativo.precoMedioTotal;
+      totalDaClasse.precoMercado += ativo.precoMercadoTotal;
+      totalDaClasse.dataHoraCotacao = new Date();
 
       totalCarteira += ativo.precoMercadoTotal;
 
       if (
-        totalDoTipo instanceof CarteiraRendaVariavelDto &&
+        totalDaClasse instanceof CarteiraRendaVariavelDto &&
         ativo instanceof CarteiraRendaVariavelDto
       ) {
-        totalDoTipo.dividendosRecebidos += ativo.dividendosRecebidos;
+        totalDaClasse.dividendosRecebidos += ativo.dividendosRecebidos;
       }
 
-      kvPair.set(ativo.tipoAtivo, totalDoTipo);
+      kvPair.set(ativo.classeAtivo, totalDaClasse);
 
       return kvPair;
     }, initialKvPair);
@@ -157,9 +155,9 @@ export class CarteiraService {
   ): void {
     let totalCarteira = 0;
     const total = carteira.reduce((kvPair, ativo) => {
-      const totalTipo = kvPair.get(ativo.tipoAtivo) ?? 0;
+      const totalClasse = kvPair.get(ativo.classeAtivo) ?? 0;
 
-      kvPair.set(ativo.tipoAtivo, totalTipo + ativo.precoMercadoTotal);
+      kvPair.set(ativo.classeAtivo, totalClasse + ativo.precoMercadoTotal);
       totalCarteira += ativo.precoMercadoTotal;
 
       return kvPair;
@@ -167,7 +165,7 @@ export class CarteiraService {
 
     for (const ativo of carteira) {
       ativo.composicao = toPercentRounded(
-        ativo.precoMercadoTotal / total.get(ativo.tipoAtivo),
+        ativo.precoMercadoTotal / total.get(ativo.classeAtivo),
       );
       ativo.composicaoTotal = toPercentRounded(
         ativo.precoMercadoTotal / totalCarteira,
@@ -190,6 +188,7 @@ export class CarteiraService {
       );
 
     ativoNaCarteira.tipoAtivo = ativo.tipo;
+    ativoNaCarteira.classeAtivo = ativo.classe;
     ativoNaCarteira.quantidade = posicao;
     ativoNaCarteira.precoMedio = precoMedio;
 
@@ -218,6 +217,7 @@ export class CarteiraService {
     const ativoNaCarteira = new CarteiraRendaFixaDto(ativo.titulo);
 
     ativoNaCarteira.tipoAtivo = ativo.tipo;
+    ativoNaCarteira.classeAtivo = ativo.classe;
     ativoNaCarteira.quantidade =
       this._operacoesRendaFixaService.calcularPosicao(operacoes, ativo.titulo);
 
@@ -251,6 +251,7 @@ export class CarteiraService {
       );
 
     ativoNaCarteira.tipoAtivo = 'Criptomoeda';
+    ativoNaCarteira.classeAtivo = ativo.classe;
     ativoNaCarteira.quantidade = posicao;
     ativoNaCarteira.precoMedio = precoMedio;
 
