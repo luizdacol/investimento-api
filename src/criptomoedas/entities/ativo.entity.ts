@@ -1,6 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { ColumnNumericTransformer } from '../../transformers/ColumnNumericTransformer';
 import { Operacao } from './operacao.entity';
+import { ClasseAtivo } from '../../enums/classe-ativo.enum';
 
 @Entity('ativos_cripto')
 export class Ativo {
@@ -12,6 +13,9 @@ export class Ativo {
 
   @Column()
   nome: string;
+
+  @Column()
+  classe: ClasseAtivo;
 
   @Column('numeric', {
     transformer: new ColumnNumericTransformer(),
