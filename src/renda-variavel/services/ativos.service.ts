@@ -50,6 +50,7 @@ export class AtivosService {
 
     if (updateAtivoDto.ticker) ativo.ticker = updateAtivoDto.ticker;
     if (updateAtivoDto.tipo) ativo.tipo = updateAtivoDto.tipo;
+    if (updateAtivoDto.classe) ativo.classe = updateAtivoDto.classe;
     if (updateAtivoDto.segmento) ativo.segmento = updateAtivoDto.segmento;
     if (updateAtivoDto.cotacao) ativo.cotacao = updateAtivoDto.cotacao;
     if (updateAtivoDto.dataHoraCotacao)

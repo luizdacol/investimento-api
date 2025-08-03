@@ -8,6 +8,7 @@ import {
   IsOptional,
 } from 'class-validator';
 import { TipoAtivo } from '../../enums/tipo-ativo.enum';
+import { ClasseAtivo } from '../../enums/classe-ativo.enum';
 
 export class CreateAtivoDto {
   @IsString()
@@ -17,6 +18,9 @@ export class CreateAtivoDto {
 
   @IsEnum(TipoAtivo)
   tipo?: TipoAtivo;
+
+  @IsEnum(ClasseAtivo)
+  classe?: ClasseAtivo;
 
   @IsString()
   segmento?: string;

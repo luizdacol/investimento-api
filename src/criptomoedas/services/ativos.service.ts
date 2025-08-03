@@ -50,6 +50,7 @@ export class AtivosService {
 
     if (updateAtivoDto.codigo) ativo.codigo = updateAtivoDto.codigo;
     if (updateAtivoDto.nome) ativo.nome = updateAtivoDto.nome;
+    if (updateAtivoDto.classe) ativo.classe = updateAtivoDto.classe;
     if (updateAtivoDto.cotacao) ativo.cotacao = updateAtivoDto.cotacao;
     if (updateAtivoDto.dataHoraCotacao)
       ativo.dataHoraCotacao = updateAtivoDto.dataHoraCotacao;

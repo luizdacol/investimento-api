@@ -5,13 +5,18 @@ import {
   IsNumber,
   IsDate,
   IsOptional,
+  IsEnum,
 } from 'class-validator';
+import { ClasseAtivo } from '../../enums/classe-ativo.enum';
 
 export class CreateAtivoDto {
   @IsString()
   @IsNotEmpty()
   @Transform((param) => param.value.toUpperCase())
   codigo: string;
+
+  @IsEnum(ClasseAtivo)
+  classe?: ClasseAtivo;
 
   @IsString()
   nome?: string;
