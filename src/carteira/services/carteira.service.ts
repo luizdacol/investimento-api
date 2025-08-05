@@ -106,6 +106,7 @@ export class CarteiraService {
     >([
       [ClasseAtivo.FUNDO_IMOBILIARIO, new CarteiraRendaVariavelDto('Total')],
       [ClasseAtivo.BOLSA_BRASILEIRA, new CarteiraRendaVariavelDto('Total')],
+      [ClasseAtivo.BOLSA_AMERICANA, new CarteiraRendaVariavelDto('Total')],
       [ClasseAtivo.CDB, new CarteiraRendaFixaDto('Total')],
       [ClasseAtivo.TESOURO_DIRETO, new CarteiraRendaFixaDto('Total')],
       [ClasseAtivo.CRIPTOMOEDA, new CarteiraCriptomoedaDto('Total')],
