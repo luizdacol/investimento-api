@@ -91,6 +91,7 @@ export class CotacaoService {
   }
 
   async getQuoteDollar(): Promise<CotacaoRendaVariavelDto> {
+    const codigoMoeda = 'USD';
     const dataHojeFormatada = new Date()
       .toLocaleDateString('en-US', {
         month: '2-digit',
@@ -102,7 +103,7 @@ export class CotacaoService {
     const { data } = await firstValueFrom(
       this.httpService
         .get<OlindaBcbQuoteResponseDto>(
-          `https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoDolarDia(dataCotacao=@dataCotacao)?@dataCotacao='${dataHojeFormatada}'&$format=json`,
+          `https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoMoedaAberturaOuIntermediario(codigoMoeda=@codigoMoeda,dataCotacao=@dataCotacao)?@codigoMoeda='${codigoMoeda}'&@dataCotacao='${dataHojeFormatada}'&$format=json`,
         )
         .pipe(
           catchError((error: AxiosError) => {
