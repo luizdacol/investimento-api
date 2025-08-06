@@ -38,11 +38,12 @@ export class AtivosController {
 
     const cotacao = await this._cotacaoService.getQuoteInformation(
       createAtivoDto.ticker,
+      createAtivoDto.classe,
     );
 
     if (cotacao) {
-      createAtivoDto.cotacao = cotacao.regularMarketPrice;
-      createAtivoDto.dataHoraCotacao = new Date(cotacao.regularMarketTime);
+      createAtivoDto.cotacao = cotacao.preco;
+      createAtivoDto.dataHoraCotacao = cotacao.dataHora;
     }
 
     return this._ativosService.create(createAtivoDto);
@@ -53,16 +54,16 @@ export class AtivosController {
     const ativos = await this._ativosService.findAll();
 
     const cotacoesPromise = ativos.map((ativo) =>
-      this._cotacaoService.getQuoteInformation(ativo.ticker),
+      this._cotacaoService.getQuoteInformation(ativo.ticker, ativo.classe),
     );
     const cotacoes = await Promise.all(cotacoesPromise);
 
     cotacoes.forEach((cotacao) => {
       if (cotacao) {
-        const ativo = ativos.find((ativo) => ativo.ticker === cotacao.symbol);
+        const ativo = ativos.find((ativo) => ativo.ticker === cotacao.nome);
         this._ativosService.update(ativo.id, {
-          cotacao: cotacao.regularMarketPrice,
-          dataHoraCotacao: new Date(cotacao.regularMarketTime),
+          cotacao: cotacao.preco,
+          dataHoraCotacao: cotacao.dataHora,
         });
       }
     });
