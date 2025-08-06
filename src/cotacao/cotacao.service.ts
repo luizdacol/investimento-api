@@ -13,6 +13,7 @@ import { CriptoResponseDto } from './dto/cripto-response.dto';
 import { AlphaQuoteInfoResponseDto } from './dto/alpha-quote-info-response.dto';
 import { CotacaoRendaVariavelDto } from './dto/quote-response.dto';
 import { ClasseAtivo } from '../enums/classe-ativo.enum';
+import { OlindaBcbQuoteResponseDto } from './dto/olinda-bcb-quote-response.dto';
 
 @Injectable()
 export class CotacaoService {
@@ -51,10 +52,13 @@ export class CotacaoService {
         ),
     );
 
-    const cotacao = new CotacaoRendaVariavelDto();
-    cotacao.nome = rootResult.results[0].symbol;
-    cotacao.preco = rootResult.results[0].regularMarketPrice;
-    cotacao.dataHora = new Date(rootResult.results[0].regularMarketTime);
+    if (rootResult.results.length === 0) return undefined;
+
+    const cotacao = new CotacaoRendaVariavelDto(
+      rootResult.results[0].symbol,
+      rootResult.results[0].regularMarketPrice,
+      new Date(rootResult.results[0].regularMarketTime),
+    );
 
     return cotacao;
   }
@@ -68,16 +72,53 @@ export class CotacaoService {
         .pipe(
           catchError((error: AxiosError) => {
             console.error(error.response.data);
-            return of({ data: { results: [] } });
+            return of({ data: { 'Global Quote': undefined } });
           }),
         ),
     );
 
-    const cotacao = new CotacaoRendaVariavelDto();
-    cotacao.nome = data['Global Quote']['01. symbol'];
-    cotacao.dataHora = new Date(data['Global Quote']['07. latest trading day']);
-    cotacao.dataHora.setHours(21);
-    cotacao.preco = +data['Global Quote']['05. price'];
+    if (!data['Global Quote']) return undefined;
+
+    const cotacao = new CotacaoRendaVariavelDto(
+      data['Global Quote']['01. symbol'],
+      +data['Global Quote']['05. price'],
+      new Date(
+        data['Global Quote']['07. latest trading day'] + 'T21:00:00.000Z',
+      ),
+    );
+
+    return cotacao;
+  }
+
+  async getQuoteDollar(): Promise<CotacaoRendaVariavelDto> {
+    const dataHojeFormatada = new Date()
+      .toLocaleDateString('en-US', {
+        month: '2-digit',
+        day: '2-digit',
+        year: 'numeric',
+      })
+      .replace(/\//g, '-');
+
+    const { data } = await firstValueFrom(
+      this.httpService
+        .get<OlindaBcbQuoteResponseDto>(
+          `https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoDolarDia(dataCotacao=@dataCotacao)?@dataCotacao='${dataHojeFormatada}'&$format=json`,
+        )
+        .pipe(
+          catchError((error: AxiosError) => {
+            console.error(error.response.data);
+            return of({ data: { value: [] } });
+          }),
+        ),
+    );
+
+    if (data.value.length === 0) return undefined;
+
+    const cotacao = new CotacaoRendaVariavelDto(
+      'USD',
+      data.value[0].cotacaoCompra,
+      new Date(data.value[0].dataHoraCotacao),
+    );
 
     return cotacao;
   }
@@ -98,8 +139,8 @@ export class CotacaoService {
   }
 
   //Método preparado para buscar apenas a cotação de BTC
-  async getCriptoInformation(): Promise<CriptoResponseDto> {
-    const data = await firstValueFrom(
+  async getCriptoInformation(): Promise<CotacaoRendaVariavelDto> {
+    const { data } = await firstValueFrom(
       this.httpService
         .get<CriptoResponseDto>(
           'https://cointradermonitor.com/api/pbb/v1/ticker',
@@ -112,6 +153,12 @@ export class CotacaoService {
         ),
     );
 
-    return data.data;
+    const cotacao = new CotacaoRendaVariavelDto(
+      'BTC',
+      data.last,
+      new Date(data.time),
+    );
+
+    return cotacao;
   }
 }
