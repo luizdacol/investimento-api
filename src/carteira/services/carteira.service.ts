@@ -87,8 +87,11 @@ export class CarteiraService {
       if (ativoNaCarteira.quantidade > 0) carteira.push(ativoNaCarteira);
     }
 
-    this.calculateComposicao(carteira);
-    this.calculateTotal(carteira);
+    const cotacaoDolar =
+      await this._ativosCriptomoedaService.findByCodigo('USD');
+
+    this.calculateComposicao(carteira, cotacaoDolar.cotacao);
+    this.calculateTotal(carteira, cotacaoDolar.cotacao);
 
     return carteira;
   }
@@ -99,6 +102,7 @@ export class CarteiraService {
       | CarteiraRendaFixaDto
       | CarteiraCriptomoedaDto
     )[],
+    cotacaoDolar: number,
   ) {
     const initialKvPair = new Map<
       string,
@@ -117,13 +121,19 @@ export class CarteiraService {
     const totais = carteira.reduce((kvPair, ativo) => {
       const totalDaClasse = kvPair.get(ativo.classeAtivo);
 
+      let precoTotalEmReais = ativo.precoMercadoTotal;
+      if (ativo.classeAtivo === ClasseAtivo.BOLSA_AMERICANA) {
+        //Calcula o preço em reais dado a cotação do dolar
+        precoTotalEmReais = ativo.precoMercadoTotal * cotacaoDolar;
+      }
+
       totalDaClasse.classeAtivo = ativo.classeAtivo;
       totalDaClasse.quantidade = 1;
       totalDaClasse.precoMedio += ativo.precoMedioTotal;
       totalDaClasse.precoMercado += ativo.precoMercadoTotal;
       totalDaClasse.dataHoraCotacao = new Date();
 
-      totalCarteira += ativo.precoMercadoTotal;
+      totalCarteira += precoTotalEmReais;
 
       if (
         totalDaClasse instanceof CarteiraRendaVariavelDto &&
@@ -138,9 +148,15 @@ export class CarteiraService {
     }, initialKvPair);
 
     for (const total of totais.values()) {
+      let precoTotalEmReais = total.precoMercadoTotal;
+      if (total.classeAtivo === ClasseAtivo.BOLSA_AMERICANA) {
+        //Calcula o preço em reais dado a cotação do dolar
+        precoTotalEmReais = total.precoMercadoTotal * cotacaoDolar;
+      }
+
       total.composicao = 100;
       total.composicaoTotal = toPercentRounded(
-        total.precoMercadoTotal / totalCarteira,
+        precoTotalEmReais / totalCarteira,
       );
     }
 
@@ -153,23 +169,36 @@ export class CarteiraService {
       | CarteiraRendaFixaDto
       | CarteiraCriptomoedaDto
     )[],
+    cotacaoDolar: number,
   ): void {
     let totalCarteira = 0;
-    const total = carteira.reduce((kvPair, ativo) => {
+    const totalPorClasse = carteira.reduce((kvPair, ativo) => {
       const totalClasse = kvPair.get(ativo.classeAtivo) ?? 0;
 
-      kvPair.set(ativo.classeAtivo, totalClasse + ativo.precoMercadoTotal);
-      totalCarteira += ativo.precoMercadoTotal;
+      let precoTotalEmReais = ativo.precoMercadoTotal;
+      if (ativo.classeAtivo === ClasseAtivo.BOLSA_AMERICANA) {
+        //Calcula o preço em reais dado a cotação do dolar
+        precoTotalEmReais = ativo.precoMercadoTotal * cotacaoDolar;
+      }
+
+      kvPair.set(ativo.classeAtivo, totalClasse + precoTotalEmReais);
+      totalCarteira += precoTotalEmReais;
 
       return kvPair;
     }, new Map<string, number>());
 
     for (const ativo of carteira) {
+      let precoTotalEmReais = ativo.precoMercadoTotal;
+      if (ativo.classeAtivo === ClasseAtivo.BOLSA_AMERICANA) {
+        //Calcula o preço em reais dado a cotação do dolar
+        precoTotalEmReais = ativo.precoMercadoTotal * cotacaoDolar;
+      }
+
       ativo.composicao = toPercentRounded(
-        ativo.precoMercadoTotal / total.get(ativo.classeAtivo),
+        precoTotalEmReais / totalPorClasse.get(ativo.classeAtivo),
       );
       ativo.composicaoTotal = toPercentRounded(
-        ativo.precoMercadoTotal / totalCarteira,
+        precoTotalEmReais / totalCarteira,
       );
     }
   }
