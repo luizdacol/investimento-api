@@ -14,6 +14,7 @@ import { AtivosService } from '../services/ativos.service';
 import { CreateAtivoDto } from '../dto/create-ativo.dto';
 import { CotacaoService } from '../../cotacao/cotacao.service';
 import { UpdateAtivoDto } from '../dto/update-ativo.dto';
+import { CotacaoRendaVariavelDto } from '../../cotacao/dto/quote-response.dto';
 
 @Controller('v1/criptomoedas/ativos')
 export class AtivosController {
@@ -36,11 +37,16 @@ export class AtivosController {
   async create(@Body() createAtivoDto: CreateAtivoDto) {
     console.log('[POST][Ativos] Incoming request: ', createAtivoDto);
 
-    const cotacao = await this._cotacaoService.getCriptoInformation();
+    let cotacao: CotacaoRendaVariavelDto;
+    if (createAtivoDto.codigo === 'BTC') {
+      cotacao = await this._cotacaoService.getCriptoInformation();
+    } else if (createAtivoDto.codigo === 'USD') {
+      cotacao = await this._cotacaoService.getQuoteDollar();
+    }
 
     if (cotacao) {
-      createAtivoDto.cotacao = cotacao.last;
-      createAtivoDto.dataHoraCotacao = new Date(cotacao.time);
+      createAtivoDto.cotacao = cotacao.preco;
+      createAtivoDto.dataHoraCotacao = cotacao.dataHora;
     }
 
     return this._ativosService.create(createAtivoDto);
@@ -49,15 +55,27 @@ export class AtivosController {
   @Patch('/update-prices')
   async updatePrices(): Promise<boolean> {
     const ativos = await this._ativosService.findAll();
-    const cotacao = await this._cotacaoService.getCriptoInformation();
 
-    if (cotacao) {
-      const ativo = ativos.find((ativo) => ativo.codigo === 'BTC');
-      this._ativosService.update(ativo.id, {
-        cotacao: cotacao.last,
-        dataHoraCotacao: new Date(cotacao.time),
-      });
-    }
+    const cotacoesPromise = ativos.map((ativo) => {
+      if (ativo.codigo === 'BTC') {
+        return this._cotacaoService.getCriptoInformation();
+      } else if (ativo.codigo === 'USD') {
+        return this._cotacaoService.getQuoteDollar();
+      }
+      return undefined;
+    });
+
+    const cotacoes = await Promise.all(cotacoesPromise);
+
+    cotacoes.forEach((cotacao) => {
+      if (cotacao) {
+        const ativo = ativos.find((ativo) => ativo.codigo === cotacao.nome);
+        this._ativosService.update(ativo.id, {
+          cotacao: cotacao.preco,
+          dataHoraCotacao: cotacao.dataHora,
+        });
+      }
+    });
 
     return true;
   }
