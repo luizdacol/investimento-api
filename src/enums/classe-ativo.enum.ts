@@ -5,4 +5,5 @@ export enum ClasseAtivo {
   TESOURO_DIRETO = 'Tesouro Direto',
   CDB = 'CDB',
   CRIPTOMOEDA = 'Criptomoeda',
+  MOEDA = 'Moeda',
 }
