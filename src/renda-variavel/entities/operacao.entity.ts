@@ -30,7 +30,7 @@ export class Operacao {
   })
   precoUnitario: number;
 
-  @Column({ transformer: new ColumnNumericTransformer() })
+  @Column('numeric', { transformer: new ColumnNumericTransformer() })
   quantidade: number;
 
   @Column('numeric', {

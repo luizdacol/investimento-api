@@ -1,7 +1,6 @@
 import { Transform, Type } from 'class-transformer';
 import {
   IsNumber,
-  IsInt,
   IsEnum,
   IsNotEmpty,
   IsString,
@@ -22,7 +21,7 @@ export class CreateOperacaoDto {
   @IsNumber()
   precoUnitario: number;
 
-  @IsInt()
+  @IsNumber()
   quantidade: number;
 
   @IsEnum(TipoOperacao)
