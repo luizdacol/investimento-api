@@ -2,6 +2,7 @@ import { OperacoesService } from './operacoes.service';
 import { Operacao } from '../entities/operacao.entity';
 import { TipoAtivo } from '../../enums/tipo-ativo.enum';
 import { TipoOperacao } from '../../enums/tipo-operacao.enum';
+import { ClasseAtivo } from '../../enums/classe-ativo.enum';
 
 describe('OperacoesService (Renda Variavel)', () => {
   const ativo = {
@@ -9,6 +10,7 @@ describe('OperacoesService (Renda Variavel)', () => {
     ticker: 'TEST3',
     tipo: TipoAtivo.ACAO,
     operacoes: [],
+    classe: ClasseAtivo.BOLSA_BRASILEIRA,
   };
 
   const operacoesService: OperacoesService = new OperacoesService(

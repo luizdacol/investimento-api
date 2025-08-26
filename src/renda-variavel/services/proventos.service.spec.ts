@@ -6,6 +6,7 @@ import { Operacao } from '../entities/operacao.entity';
 import { Provento } from '../entities/provento.entity';
 import { ProventosService } from './proventos.service';
 import '../../utils/tests';
+import { ClasseAtivo } from '../../enums/classe-ativo.enum';
 
 describe('ProventosService (Renda Variavel)', () => {
   const ativo = {
@@ -13,6 +14,7 @@ describe('ProventosService (Renda Variavel)', () => {
     ticker: 'TEST3',
     tipo: TipoAtivo.ACAO,
     operacoes: [],
+    classe: ClasseAtivo.BOLSA_BRASILEIRA,
   };
 
   const proventosService: ProventosService = new ProventosService(
