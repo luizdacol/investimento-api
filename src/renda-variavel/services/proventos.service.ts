@@ -15,6 +15,7 @@ import { getUltimoDiaPorPeriodo } from '../../utils/helper';
 import { ResumoProventoPorDataDto } from '../dto/resumo-provento-por-data.dto';
 import { TipoAtivo } from '../../enums/tipo-ativo.enum';
 import { PaginatedDto } from '../dto/paginated.dto';
+import { ClasseAtivo } from '../../enums/classe-ativo.enum';
 
 @Injectable()
 export class ProventosService {
@@ -34,6 +35,10 @@ export class ProventosService {
     tipo: TipoProvento,
     ativo: Ativo,
   ): number {
+    if (ativo.classe === ClasseAtivo.BOLSA_AMERICANA) {
+      return valorBruto * (1 - 0.3);
+    }
+
     if (tipo === TipoProvento.JCP || ativo.tipo === TipoAtivo.ETF)
       return valorBruto * (1 - 0.15);
 

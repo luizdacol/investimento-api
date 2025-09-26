@@ -40,7 +40,7 @@ export class Provento {
   })
   valorLiquido: number;
 
-  @Column()
+  @Column('numeric', { transformer: new ColumnNumericTransformer() })
   posicao: number;
 
   @Column('numeric', {
