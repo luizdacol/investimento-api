@@ -43,7 +43,7 @@ export class AtivosController {
   async updatePrices(): Promise<boolean> {
     const ativos = await this._ativosService.findAll();
 
-    const cotacoes = await this._cotacaoService.getTesouroInformation();
+    const cotacoes = await this._cotacaoService.getTesouroInformationV2();
 
     ativos.forEach((ativo) => {
       const cotacao = cotacoes.find(

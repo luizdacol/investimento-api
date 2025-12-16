@@ -14,6 +14,7 @@ import { AlphaQuoteInfoResponseDto } from './dto/alpha-quote-info-response.dto';
 import { CotacaoRendaVariavelDto } from './dto/quote-response.dto';
 import { ClasseAtivo } from '../enums/classe-ativo.enum';
 import { OlindaBcbQuoteResponseDto } from './dto/olinda-bcb-quote-response.dto';
+import { TesouroDiretoResponseV2Dto } from './dto/tesouro-direto-response-v2.dto';
 
 @Injectable()
 export class CotacaoService {
@@ -122,6 +123,34 @@ export class CotacaoService {
     );
 
     return cotacao;
+  }
+
+  async getTesouroInformationV2(): Promise<TreasureBondTradeList[]> {
+    const { data: tesouroDiretoJson } = await firstValueFrom(
+      this.httpService
+        .get<TesouroDiretoResponseV2Dto>(
+          'https://tesouro.gabrielgaspar.com.br/bonds',
+        )
+        .pipe(
+          catchError((error: AxiosError) => {
+            console.error(error.response.data);
+            throw 'An error happened!';
+          }),
+        ),
+    );
+
+    return tesouroDiretoJson.bonds.map((bond) => {
+      return {
+        TrsrBd: {
+          nm: bond.name,
+          untrInvstmtVal: bond.unitary_investment_value,
+          anulInvstmtRate: Number(bond.annual_investment_rate), //NaN
+          untrRedVal: bond.unitary_redemption_value,
+          anulRedRate: Number(bond.annual_redemption_rate), //NaN
+          mtrtyDt: bond.maturity,
+        },
+      } as TreasureBondTradeList;
+    });
   }
 
   async getTesouroInformation(): Promise<TreasureBondTradeList[]> {
