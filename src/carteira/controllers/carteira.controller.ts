@@ -46,4 +46,9 @@ export class CarteiraController {
       return obj.codigo;
     }
   }
+
+  @Get('total-consolidado')
+  async getTotal() {
+    return this.carteiraService.calculateTotalConsolidado();
+  }
 }
