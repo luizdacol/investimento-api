@@ -19,7 +19,6 @@ import { toPercentRounded } from '../../utils/helper';
 import { TipoPeriodo } from '../../enums/tipo-periodo.enum';
 import { CarteiraCriptomoedaDto } from '../dto/carteira-criptomoeda.dto';
 import { ClasseAtivo } from '../../enums/classe-ativo.enum';
-import { TipoOperacao } from '../../enums/tipo-operacao.enum';
 
 @Injectable()
 export class CarteiraService {
@@ -292,11 +291,24 @@ export class CarteiraService {
     return ativoNaCarteira;
   }
 
-  async calculateTotalConsolidado() {
+  async calculatePatrimonio() {
     const carteira = await this.calculateCarteira(new Date());
     const cotacaoDolar =
       await this._ativosCriptomoedaService.findByCodigo('USD');
-    const totalAtual = carteira
+
+    const totaisCarteira = carteira.filter((c) => c.nome === 'Total');
+    const valorEmDolar = totaisCarteira.find(
+      (c) => c.classeAtivo === ClasseAtivo.BOLSA_AMERICANA,
+    ).precoMercadoTotal;
+
+    const valorEmReais = totaisCarteira
+      .filter((c) => c.classeAtivo !== ClasseAtivo.BOLSA_AMERICANA)
+      .map((c) => c.precoMercadoTotal)
+      .reduce((previous, current) => previous + current);
+
+    const patrimonioTotal = valorEmDolar * cotacaoDolar.cotacao + valorEmReais;
+
+    carteira
       .filter((c) => c.nome === 'Total')
       .reduce((valorTotal, classe) => {
         let valorTotalEmReais = classe.precoMercadoTotal;
@@ -306,62 +318,10 @@ export class CarteiraService {
         return valorTotal + valorTotalEmReais;
       }, 0);
 
-    const totalAportado = await this.calculateTotalAportado();
-
     return {
-      totalAtual,
-      totalAportado,
+      patrimonioTotal,
+      valorEmReais,
+      valorEmDolar,
     };
-  }
-
-  async calculateTotalAportado() {
-    const [
-      { content: operacoesRV },
-      operacoesRF,
-      { content: operacoesCripto },
-    ] = await Promise.all([
-      this._operacoesRendaVariavelService.findAll(),
-      this._operacoesRendaFixaService.findAll(),
-      this._operacoesCriptomoedaService.findAll(),
-    ]);
-
-    const cotacaoDolar =
-      await this._ativosCriptomoedaService.findByCodigo('USD');
-
-    const valorTotalRV = operacoesRV.reduce((valorAportado, operacao) => {
-      if (operacao.tipo === TipoOperacao.COMPRA) {
-        let valorTotalEmReais = operacao.precoTotal;
-        if (operacao.ativo.classe === ClasseAtivo.BOLSA_AMERICANA) {
-          valorTotalEmReais = operacao.precoTotal * cotacaoDolar.cotacao;
-        }
-        return valorAportado + valorTotalEmReais;
-      } else if (operacao.tipo === TipoOperacao.VENDA) {
-        return valorAportado - operacao.precoTotal;
-      }
-      return valorAportado;
-    }, 0);
-
-    const valorTotalRF = operacoesRF.reduce((valorAportado, operacao) => {
-      if (operacao.tipo === TipoOperacao.COMPRA) {
-        return valorAportado + operacao.precoTotal;
-      } else if (operacao.tipo === TipoOperacao.VENDA) {
-        return valorAportado - operacao.precoTotal;
-      }
-      return valorAportado;
-    }, 0);
-
-    const valorTotalCripto = operacoesCripto.reduce(
-      (valorAportado, operacao) => {
-        if (operacao.tipo === TipoOperacao.COMPRA) {
-          return valorAportado + operacao.valorTotalLiquido;
-        } else if (operacao.tipo === TipoOperacao.VENDA) {
-          return valorAportado - operacao.valorTotalLiquido;
-        }
-        return valorAportado;
-      },
-      0,
-    );
-
-    return valorTotalRV + valorTotalRF + valorTotalCripto;
   }
 }

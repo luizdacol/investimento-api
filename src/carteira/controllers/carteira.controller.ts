@@ -47,8 +47,8 @@ export class CarteiraController {
     }
   }
 
-  @Get('total-consolidado')
+  @Get('patrimonio')
   async getTotal() {
-    return this.carteiraService.calculateTotalConsolidado();
+    return this.carteiraService.calculatePatrimonio();
   }
 }
