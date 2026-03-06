@@ -33,10 +33,19 @@ export class ProventosService {
   private calcularValorLiquido(
     valorBruto: number,
     tipo: TipoProvento,
+    dataCom: Date,
     ativo: Ativo,
   ): number {
     if (ativo.classe === ClasseAtivo.BOLSA_AMERICANA) {
       return valorBruto * (1 - 0.3);
+    }
+
+    const dataAumentoAliquotaJCP = new Date('2026-01-01');
+    if (
+      dataCom.getTime() > dataAumentoAliquotaJCP.getTime() &&
+      tipo === TipoProvento.JCP
+    ) {
+      return valorBruto * (1 - 0.175);
     }
 
     if (tipo === TipoProvento.JCP || ativo.tipo === TipoAtivo.ETF)
@@ -54,6 +63,7 @@ export class ProventosService {
     const valorLiquido = this.calcularValorLiquido(
       createProventoDto.valorBruto,
       createProventoDto.tipo,
+      createProventoDto.dataCom,
       ativo,
     );
 
@@ -128,6 +138,7 @@ export class ProventosService {
     provento.valorLiquido = this.calcularValorLiquido(
       provento.valorBruto,
       provento.tipo,
+      provento.dataCom,
       provento.ativo,
     );
 
