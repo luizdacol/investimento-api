@@ -99,7 +99,7 @@ export class GraficosController {
         .filter((c) => c.nome === 'Total' && c.composicaoTotal !== 0)
         .map((c) => {
           return {
-            name: c.tipoAtivo,
+            name: c.classeAtivo,
             value: toRounded(c.composicaoTotal),
           };
         })
