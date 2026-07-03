@@ -2,7 +2,7 @@ export class ProventosChartDto {
   data: Date;
   fii: number;
   acao: number;
-  bdr: number;
+  ['bolsa USA']: number;
   etf: number;
   carteira: number;
 }

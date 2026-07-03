@@ -3,6 +3,7 @@ import { ProventosService } from '../services/proventos.service';
 import { Provento } from '../entities/provento.entity';
 import { Between, FindOptionsWhere } from 'typeorm';
 import { ProventoComposicaoChartDto } from '../dto/provento-composicao-chart.dto';
+import { ClasseAtivo } from '../../enums/classe-ativo.enum';
 
 @Controller('v1/renda-variavel/graficos')
 export class GraficosController {
@@ -29,18 +30,23 @@ export class GraficosController {
           const item = chartDto.details.find(
             (c) => c.ativo === provento.ativo.ticker,
           );
+          const tipo =
+            provento.ativo.classe === ClasseAtivo.BOLSA_AMERICANA
+              ? 'Bolsa Americana'
+              : provento.ativo.tipo;
+
           if (item) item.total += provento.valorTotal;
           else {
             chartDto.details.push({
               ativo: provento.ativo.ticker,
               total: provento.valorTotal,
-              tipo: provento.ativo.tipo,
+              tipo: tipo,
             });
           }
 
-          const index = chartDto.labels.indexOf(provento.ativo.tipo);
+          const index = chartDto.labels.indexOf(tipo);
           if (index === -1) {
-            chartDto.labels.push(provento.ativo.tipo);
+            chartDto.labels.push(tipo);
             chartDto.data.push(provento.valorTotal);
           } else {
             chartDto.data[index] += provento.valorTotal;

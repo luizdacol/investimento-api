@@ -28,6 +28,7 @@ import { AtivosService } from '../../renda-variavel/services/ativos.service';
 import { TipoPeriodo } from '../../enums/tipo-periodo.enum';
 import { ResumoProventoPorDataDto } from '../../renda-variavel/dto/resumo-provento-por-data.dto';
 import { TipoInformacao } from '../../enums/tipo-informacao.enum';
+import { ClasseAtivo } from '../../enums/classe-ativo.enum';
 
 @Controller('v1/graficos')
 export class GraficosController {
@@ -120,7 +121,7 @@ export class GraficosController {
         data: new Date(startDate),
         fii: 0,
         acao: 0,
-        bdr: 0,
+        ['bolsa USA']: 0,
         etf: 0,
         carteira: 0,
       } as ProventosChartDto);
@@ -137,15 +138,17 @@ export class GraficosController {
 
         if (!proventoMes) return chartDto;
 
-        proventoMes.carteira += item.valorTotal;
-        if (item.ativo.tipo === TipoAtivo.ACAO) {
-          proventoMes.acao += item.valorTotal;
-        } else if (item.ativo.tipo === TipoAtivo.FII) {
-          proventoMes.fii += item.valorTotal;
-        } else if (item.ativo.tipo === TipoAtivo.BDR) {
-          proventoMes.bdr += item.valorTotal;
-        } else if (item.ativo.tipo === TipoAtivo.ETF) {
-          proventoMes.etf += item.valorTotal;
+        if (item.ativo.classe != ClasseAtivo.BOLSA_AMERICANA) {
+          proventoMes.carteira += item.valorTotal;
+          if (item.ativo.tipo === TipoAtivo.ACAO) {
+            proventoMes.acao += item.valorTotal;
+          } else if (item.ativo.tipo === TipoAtivo.FII) {
+            proventoMes.fii += item.valorTotal;
+          } else if (item.ativo.tipo === TipoAtivo.ETF) {
+            proventoMes.etf += item.valorTotal;
+          }
+        } else {
+          proventoMes['bolsa USA'] += item.valorTotal;
         }
 
         return chartDto;
